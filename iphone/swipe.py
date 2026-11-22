@@ -164,3 +164,8 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         log("Afbrudt.")
+    except Exception as e:
+        if "unlocked" in str(e) or "Locked" in str(e):
+            log("Telefonen er låst – lås op (og sæt Autolås til 'Aldrig'), kør så igen.")
+        else:
+            raise
