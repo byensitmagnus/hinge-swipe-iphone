@@ -1,0 +1,18 @@
+# Lokale filer
+dist/
+__pycache__/
+*.pyc
+.claude/
+target/
+iphone/state.json
+iphone/STOP
+iphone/*.log
+*.ipa
+
+# Hemmeligheder og lokale værktøjer – må aldrig committes
+.env
+.env.*
+!.env.example
+.kimi-code/
+*.log
+session.json

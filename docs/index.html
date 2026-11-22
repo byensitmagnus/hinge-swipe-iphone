@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hinge Auto Swipe – setup guide</title>
+<meta name="description" content="Let an AI agent swipe Hinge on your real iPhone from your PC, at a calm human pace. Step-by-step setup in 10 minutes.">
+<style>
+  :root { --bg:#fbfafc; --fg:#1b1822; --muted:#6b6577; --card:#fff; --line:#e6e2ee; --accent:#7a1fd1; --accent-fg:#fff; --code:#f0edf6; --warn:#fff4e0; --warn-line:#f0c987; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131018; --fg:#efecf4; --muted:#a49db1; --card:#1c1824; --line:#2d2838; --accent:#b57bff; --accent-fg:#150c22; --code:#262031; --warn:#2b2215; --warn-line:#6b5226; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:28px 16px 80px; }
+  header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+  h1 { font-size:clamp(28px,6vw,40px); line-height:1.15; margin:0; letter-spacing:-.02em; }
+  h2 { font-size:22px; margin:36px 0 12px; }
+  .lead { color:var(--muted); font-size:19px; margin:10px 0 24px; }
+  .lang { display:flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+  .lang button { border:0; background:transparent; color:var(--fg); padding:8px 16px; font:inherit; font-size:15px; cursor:pointer; }
+  .lang button[aria-pressed="true"] { background:var(--accent); color:var(--accent-fg); font-weight:600; }
+  .step { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:14px 0; display:flex; gap:16px; }
+  .step input { width:26px; height:26px; margin-top:3px; flex:none; accent-color:var(--accent); }
+  .step h3 { margin:0 0 6px; font-size:19px; }
+  .step p { margin:6px 0; }
+  .step > div { min-width:0; flex:1; }
+  .step.done { opacity:.6; }
+  code, pre { font-family:ui-monospace,Consolas,monospace; font-size:15px; }
+  code { background:var(--code); padding:2px 6px; border-radius:6px; }
+  pre { background:var(--code); padding:14px 16px; border-radius:12px; overflow-x:auto; margin:10px 0; position:relative; }
+  pre code { background:none; padding:0; }
+  .copy { position:absolute; top:8px; right:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:8px; padding:3px 10px; font-size:13px; cursor:pointer; }
+  .note { background:var(--warn); border:1px solid var(--warn-line); border-radius:12px; padding:12px 16px; margin:18px 0; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:16px; }
+  td, th { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  details { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin:10px 0; }
+  summary { cursor:pointer; font-weight:600; }
+  a { color:var(--accent); }
+  footer { color:var(--muted); font-size:14px; margin-top:48px; }
+  [lang-only] { display:none; }
+  html[lang="en"] [lang-only="en"], html[lang="da"] [lang-only="da"] { display:revert; }
+  html[lang="en"] span[lang-only="en"], html[lang="da"] span[lang-only="da"] { display:inline; }
+  @media (max-width:520px) { .step { padding:14px; gap:12px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Hinge Auto Swipe</h1>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-l="en" aria-pressed="true">English</button>
+      <button data-l="da" aria-pressed="false">Dansk</button>
+    </div>
+  </header>
+
+  <p class="lead" lang-only="en">Let a script swipe Hinge on your <b>real iPhone</b> from your PC, at a calm human pace. Nothing is installed on the phone except a small signed test app. About 10 minutes to set up.</p>
+  <p class="lead" lang-only="da">Lad et script swipe Hinge på din <b>rigtige iPhone</b> fra pc'en i et roligt, menneskeligt tempo. Der installeres kun en lille signeret testapp på telefonen. Tager ca. 10 minutter at sætte op.</p>
+
+  <div class="note" lang-only="en"><b>Read this first.</b> Automating Hinge is against Hinge's terms, so your account can be limited or banned. The defaults are cautious (80 likes a day, 30-minute sessions, daytime only), but there is no way to make it risk-free. Use your own account at your own risk.</div>
+  <div class="note" lang-only="da"><b>Læs først.</b> Automatisering af Hinge er imod Hinges vilkår, så din konto kan blive begrænset eller spærret. Standardindstillingerne er forsigtige (80 likes om dagen, 30 minutters sessioner, kun om dagen), men det kan aldrig blive helt risikofrit. Brug din egen konto på eget ansvar.</div>
+
+  <h2 lang-only="en">What you need</h2><h2 lang-only="da">Det skal du bruge</h2>
+  <ul lang-only="en">
+    <li>A Windows 10/11 PC (tested) – macOS and Linux should work too (untested)</li>
+    <li>An iPhone with a USB cable (tested: iPhone with iOS 27.2)</li>
+    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installs Apple's USB driver), <a href="https://www.python.org/downloads/">Python 3.11+</a>, and <a href="https://sideloadly.io">Sideloadly</a> (free)</li>
+    <li>A free Apple ID – no paid developer account needed</li>
+  </ul>
+  <ul lang-only="da">
+    <li>En Windows 10/11-pc (testet) – macOS og Linux burde virke (utestet)</li>
+    <li>En iPhone med USB-kabel (testet: iPhone med iOS 27.2)</li>
+    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installerer Apples USB-driver), <a href="https://www.python.org/downloads/">Python 3.11+</a> og <a href="https://sideloadly.io">Sideloadly</a> (gratis)</li>
+    <li>Et gratis Apple-ID – du behøver ikke en betalt udviklerkonto</li>
+  </ul>
+
+  <h2 lang-only="en">Setup – 6 steps</h2><h2 lang-only="da">Opsætning – 6 trin</h2>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">1. Get the code</h3><h3 lang-only="da">1. Hent koden</h3>
+    <pre><code>git clone https://github.com/byensitmagnus/hinge-swipe-iphone.git
+cd hinge-swipe-iphone/iphone
+pip install -r requirements.txt</code></pre>
+  </div></label>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">2. Turn on Developer Mode</h3><h3 lang-only="da">2. Slå Developer Mode til</h3>
+    <p lang-only="en">Plug in the iPhone, unlock it and tap <b>Trust</b>. Then: <i>Settings → Privacy &amp; Security → Developer Mode</i> → on. The phone restarts.</p>
+    <p lang-only="da">Sæt iPhonen i, lås den op og tryk <b>Stol på</b>. Derefter: <i>Indstillinger → Anonymitet og sikkerhed → Developer Mode</i> → til. Telefonen genstarter.</p>
+  </div></label>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">3. Build the test app</h3><h3 lang-only="da">3. Byg testappen</h3>
+    <p lang-only="en">This downloads Appium's official WebDriverAgent and packages it as an <code>.ipa</code>:</p>
+    <p lang-only="da">Det henter Appiums officielle WebDriverAgent og pakker den som en <code>.ipa</code>:</p>
+    <pre><code>python make_ipa.py</code></pre>
+  </div></label>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">4. Sign and install it with Sideloadly</h3><h3 lang-only="da">4. Signér og installér den med Sideloadly</h3>
+    <p lang-only="en">Open Sideloadly, drag <code>WebDriverAgentRunner.ipa</code> in, enter your Apple ID and press <b>Start</b>. Type the password and 2-factor code yourself. If it asks for an <i>app-specific password</i>, create one at appleid.apple.com.</p>
+    <p lang-only="da">Åbn Sideloadly, træk <code>WebDriverAgentRunner.ipa</code> ind, skriv dit Apple-ID og tryk <b>Start</b>. Adgangskode og 2-faktorkode taster du selv. Beder den om en <i>app-specifik adgangskode</i>, laver du en på appleid.apple.com.</p>
+  </div></label>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">5. Trust the developer on the phone</h3><h3 lang-only="da">5. Stol på udvikleren på telefonen</h3>
+    <p lang-only="en"><i>Settings → General → VPN &amp; Device Management</i> → tap your Apple ID → <b>Trust</b>. Also set <i>Settings → Display &amp; Brightness → Auto-Lock → Never</i>.</p>
+    <p lang-only="da"><i>Indstillinger → Generelt → VPN og enhedsstyring</i> → tryk dit Apple-ID → <b>Stol på</b>. Sæt også <i>Indstillinger → Skærm og lysstyrke → Autolås → Aldrig</i>.</p>
+  </div></label>
+
+  <label class="step"><input type="checkbox"><div>
+    <h3 lang-only="en">6. Swipe</h3><h3 lang-only="da">6. Swipe</h3>
+    <p lang-only="en">Keep the iPhone plugged in and unlocked. Open Hinge on the Discover tab, then try it safely first:</p>
+    <p lang-only="da">Lad iPhonen sidde i USB og være låst op. Åbn Hinge på Discover-fanen, og prøv det først forsigtigt:</p>
+    <pre><code>python swipe.py --dry        # shows what it would do, likes nothing
+python swipe.py --max 5      # five likes, then stops
+python swipe.py              # a normal session</code></pre>
+    <p lang-only="en">Stop it any time by creating an empty file called <code>STOP</code> in the <code>iphone</code> folder, or press Ctrl+C.</p>
+    <p lang-only="da">Stop den når som helst ved at oprette en tom fil kaldet <code>STOP</code> i mappen <code>iphone</code>, eller tryk Ctrl+C.</p>
+  </div></label>
+
+  <h2 lang-only="en">Settings</h2><h2 lang-only="da">Indstillinger</h2>
+  <table>
+    <tr><th>Option</th><th lang-only="en">Default</th><th lang-only="da">Standard</th><th lang-only="en">Meaning</th><th lang-only="da">Betydning</th></tr>
+    <tr><td><code>--daily</code></td><td>80</td><td></td><td lang-only="en">Max likes per day</td><td lang-only="da">Max likes pr. dag</td></tr>
+    <tr><td><code>--minutes</code></td><td>30</td><td></td><td lang-only="en">Stop after this many minutes</td><td lang-only="da">Stop efter så mange minutter</td></tr>
+    <tr><td><code>--from-hour</code> / <code>--to-hour</code></td><td>8 / 23</td><td></td><td lang-only="en">Only swipe between these hours (local time)</td><td lang-only="da">Swipe kun mellem disse klokkeslæt (lokal tid)</td></tr>
+    <tr><td><code>--max</code></td><td>0</td><td></td><td lang-only="en">Likes in this run (0 = no limit)</td><td lang-only="da">Likes i denne kørsel (0 = ingen grænse)</td></tr>
+    <tr><td><code>--dry</code></td><td>–</td><td></td><td lang-only="en">Look, don't like</td><td lang-only="da">Kig, men like ikke</td></tr>
+  </table>
+  <p lang-only="en">Pace: 5–12 seconds between likes, now and then a longer look, a 45–120 second break every 12–25 profiles. It never taps the paid <i>Send a Rose</i> button and never sends messages.</p>
+  <p lang-only="da">Tempo: 5–12 sekunder mellem likes, af og til et længere kig og en pause på 45–120 sekunder hver 12.–25. profil. Den trykker aldrig på den betalte <i>Send en rose</i>-knap og sender aldrig beskeder.</p>
+
+  <h2 lang-only="en">Troubleshooting</h2><h2 lang-only="da">Fejlfinding</h2>
+  <details><summary lang-only="en">"device was not, or could not be, unlocked"</summary><summary lang-only="da">"device was not, or could not be, unlocked"</summary>
+    <p lang-only="en">The iPhone is locked with a passcode. Unlock it and set Auto-Lock to Never. The script cannot enter your passcode.</p>
+    <p lang-only="da">iPhonen er låst med en kode. Lås den op og sæt Autolås til Aldrig. Scriptet kan ikke taste din kode.</p></details>
+  <details><summary lang-only="en">"WebDriverAgentRunner is not installed"</summary><summary lang-only="da">"WebDriverAgentRunner er ikke installeret"</summary>
+    <p lang-only="en">Repeat steps 3–5. With a free Apple ID the signature expires after 7 days – then just repeat step 4.</p>
+    <p lang-only="da">Gentag trin 3–5. Med et gratis Apple-ID udløber signaturen efter 7 dage – så gentager du bare trin 4.</p></details>
+  <details><summary lang-only="en">The phone is not found</summary><summary lang-only="da">Telefonen findes ikke</summary>
+    <p lang-only="en">Install iTunes (for the USB driver), use a data cable, unlock the phone and tap Trust. Check with <code>python -m pymobiledevice3 usbmux list</code>.</p>
+    <p lang-only="da">Installér iTunes (til USB-driveren), brug et datakabel, lås telefonen op og tryk Stol på. Tjek med <code>python -m pymobiledevice3 usbmux list</code>.</p></details>
+  <details><summary lang-only="en">Hinge shows a privacy pop-up again and again</summary><summary lang-only="da">Hinge viser hele tiden et privatlivs-vindue</summary>
+    <p lang-only="en">Hinge shows it at random. The script taps <i>I agree</i> automatically. If you would rather decline it, change <code>accept_consent</code> in <code>wda.py</code>.</p>
+    <p lang-only="da">Hinge viser det tilfældigt. Scriptet trykker automatisk <i>Jeg er enig</i>. Vil du hellere afvise, ændrer du <code>accept_consent</code> i <code>wda.py</code>.</p></details>
+  <details><summary lang-only="en">"Unexpected screen" and it stops</summary><summary lang-only="da">"Uventet skærm" og den stopper</summary>
+    <p lang-only="en">Hinge is somewhere the script does not know (a paywall, a pop-up, a different language). The script goes back to Discover on its own and stops after three misses. Button names are Danish; for another language change <code>LIKE_PREFIX</code> and <code>SEND_LIKE</code> in <code>swipe.py</code> – <code>python inspect_screen.py</code> prints the names Hinge uses.</p>
+    <p lang-only="da">Hinge står et sted, scriptet ikke kender (paywall, pop-up, andet sprog). Scriptet går selv tilbage til Discover og stopper efter tre fejl. Knapnavnene er danske; til et andet sprog ændrer du <code>LIKE_PREFIX</code> og <code>SEND_LIKE</code> i <code>swipe.py</code> – <code>python inspect_screen.py</code> viser de navne, Hinge bruger.</p></details>
+
+  <h2 lang-only="en">How it works</h2><h2 lang-only="da">Sådan virker det</h2>
+  <p lang-only="en">A small test app (Appium's WebDriverAgent) runs on your iPhone. <a href="https://github.com/doronz88/pymobiledevice3">pymobiledevice3</a> starts it over USB and sends taps and swipes, the same way a UI test would. The real Hinge app does all the talking to Hinge – the script only presses buttons by name.</p>
+  <p lang-only="da">En lille testapp (Appiums WebDriverAgent) kører på din iPhone. <a href="https://github.com/doronz88/pymobiledevice3">pymobiledevice3</a> starter den over USB og sender tryk og swipes, ligesom en UI-test. Den rigtige Hinge-app står selv for al kommunikation med Hinge – scriptet trykker kun på knapper ved navn.</p>
+
+  <footer>
+    <span lang-only="en">Open source, MIT license. Not affiliated with Hinge or Match Group.</span>
+    <span lang-only="da">Open source, MIT-licens. Ikke tilknyttet Hinge eller Match Group.</span>
+    · <a href="https://github.com/byensitmagnus/hinge-swipe-iphone">GitHub</a>
+  </footer>
+</main>
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.lang button');
+  function setLang(l) {
+    root.lang = l;
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
+    try { localStorage.setItem('lang', l); } catch (e) {}
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+  let saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  setLang(saved || ((navigator.language || '').toLowerCase().startsWith('da') ? 'da' : 'en'));
+  document.querySelectorAll('.step input').forEach(cb => cb.addEventListener('change', () => cb.closest('.step').classList.toggle('done', cb.checked)));
+  document.querySelectorAll('pre').forEach(pre => {
+    const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'Copy';
+    b.addEventListener('click', () => { navigator.clipboard.writeText(pre.querySelector('code').innerText).then(() => { b.textContent = '✓'; setTimeout(() => b.textContent = 'Copy', 1200); }); });
+    pre.appendChild(b);
+  });
+</script>
+</body>
+</html>
