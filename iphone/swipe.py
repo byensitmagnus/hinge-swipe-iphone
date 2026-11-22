@@ -26,11 +26,18 @@ def log(msg: str) -> None:
     print(f"{dt.datetime.now():%H:%M:%S}  {msg}", flush=True)
 
 
-async def nap(seconds: float) -> bool:
-    """Sov, men reagér på STOP-filen. True = stop."""
+async def nap(c, seconds: float) -> bool:
+    """Sov, men reagér på STOP-filen. True = stop. Rører skærmen let hver ~12 s, så iPhonen ikke autolåser (Autolås min. 30 s)."""
     end = time.monotonic() + seconds
+    touch = time.monotonic() + 12
     while time.monotonic() < end and not STOP.exists():
         await asyncio.sleep(min(1.0, max(0.0, end - time.monotonic())))
+        if time.monotonic() >= touch and time.monotonic() < end - 2:
+            touch = time.monotonic() + random.uniform(9, 13)
+            try:   # lille scroll på profilen = ægte berøring, ændrer intet
+                await c.swipe(200, 500, 200, random.choice((470, 530)), duration=0.3, session_id=c.session_id)
+            except Exception:
+                pass
     return STOP.exists()
 
 
@@ -142,8 +149,8 @@ async def main() -> None:
                 since_break, next_break = 0, random.randint(12, 25)
                 pause = random.uniform(45, 120)
                 log(f"Pause på {pause:.0f} s")
-                await nap(pause)
-            await nap(human_delay(random.random(), random.random()))
+                await nap(c, pause)
+            await nap(c, human_delay(random.random(), random.random()))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-labelledby="t d">
+  <title id="t">Hinge Auto Swipe</title>
+  <desc id="d">A PC connected over USB to a real iPhone running Hinge, pressing the like button at a calm human pace.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14101f"/>
+      <stop offset="1" stop-color="#0b0a10"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#a855f7" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      .h{font:800 76px 'Segoe UI',Inter,Helvetica,Arial,sans-serif;fill:#fff;letter-spacing:-2px}
+      .s{font:500 26px 'Segoe UI',Inter,Helvetica,Arial,sans-serif;fill:#c9c3d9}
+      .c{font:600 22px 'Segoe UI',Inter,Helvetica,Arial,sans-serif;fill:#e9e5f5}
+      .m{font:500 19px 'Segoe UI',Inter,Helvetica,Arial,sans-serif;fill:#9a93b0}
+      .p{font:700 20px ui-monospace,Consolas,monospace;fill:#fff}
+    </style>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <circle cx="980" cy="320" r="300" fill="url(#halo)"/>
+
+  <text x="80" y="190" class="h">Hinge Auto Swipe</text>
+  <text x="82" y="248" class="s">Your real iPhone. Your PC. A calm human pace.</text>
+
+  <g transform="translate(82,300)">
+    <rect width="190" height="44" rx="22" fill="#241d36"/><text x="95" y="29" text-anchor="middle" class="c">No jailbreak</text>
+    <rect x="206" width="190" height="44" rx="22" fill="#241d36"/><text x="301" y="29" text-anchor="middle" class="c">No fake API</text>
+    <rect x="412" width="186" height="44" rx="22" fill="#241d36"/><text x="505" y="29" text-anchor="middle" class="c">Open source</text>
+  </g>
+  <text x="82" y="420" class="m">80 likes/day max  ·  daytime only  ·  breaks like a person  ·  EN + DA guide</text>
+  <g transform="translate(82,470)">
+    <rect width="470" height="64" rx="14" fill="#0b0a10" stroke="#3a2f57"/>
+    <text x="22" y="40" class="p">python swipe.py --max 5</text>
+  </g>
+
+  <!-- PC -->
+  <g transform="translate(740,200)">
+    <rect width="190" height="124" rx="12" fill="#1c1630" stroke="#4b3b78" stroke-width="2"/>
+    <rect x="12" y="12" width="166" height="92" rx="6" fill="#0b0a10"/>
+    <text x="24" y="42" class="p" style="font-size:14px;fill:#a855f7">$ swipe.py</text>
+    <text x="24" y="66" class="p" style="font-size:14px;fill:#c9c3d9">likes today 12/80</text>
+    <rect x="70" y="124" width="50" height="18" fill="#2a2145"/>
+    <rect x="40" y="142" width="110" height="10" rx="5" fill="#2a2145"/>
+    <text x="95" y="190" text-anchor="middle" class="m">Windows PC</text>
+  </g>
+  <!-- USB cable -->
+  <path d="M930 262 C 985 262, 1000 330, 1050 330" fill="none" stroke="url(#glow)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 14"/>
+  <text x="980" y="380" text-anchor="middle" class="m">USB</text>
+  <!-- iPhone -->
+  <g transform="translate(1050,150)">
+    <rect width="150" height="300" rx="28" fill="#1c1630" stroke="#4b3b78" stroke-width="2"/>
+    <rect x="10" y="14" width="130" height="272" rx="20" fill="#0b0a10"/>
+    <rect x="52" y="22" width="46" height="10" rx="5" fill="#1c1630"/>
+    <rect x="22" y="48" width="106" height="130" rx="12" fill="#241d36"/>
+    <circle cx="75" cy="96" r="22" fill="#3a2f57"/>
+    <rect x="42" y="130" width="66" height="10" rx="5" fill="#3a2f57"/>
+    <rect x="30" y="198" width="90" height="38" rx="19" fill="url(#glow)"/>
+    <path d="M75 226 c-12 -9 -19 -14 -19 -22 a9 9 0 0 1 19 -3 a9 9 0 0 1 19 3 c0 8 -7 13 -19 22z" fill="#fff"/>
+    <text x="75" y="336" text-anchor="middle" class="m">Real Hinge app</text>
+  </g>
+</svg>
