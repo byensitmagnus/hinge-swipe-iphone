@@ -107,6 +107,8 @@ async def main() -> None:
             if not in_active_hours(dt.datetime.now().hour, a.from_hour, a.to_hour):
                 return log("Tidsrummet er slut – stopper.")
 
+            if "SBCoverSheetWindow" in {e["name"] for e in await visible(c)}:
+                return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
             if await accept_consent(c):
                 log("Privatlivs-vindue accepteret.")
                 await asyncio.sleep(2)
