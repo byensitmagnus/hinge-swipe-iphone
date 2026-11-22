@@ -106,6 +106,15 @@ async def tap(c, name: str) -> bool:
         return False
 
 
+async def activate(c, bundle_id: str = HINGE) -> bool:
+    """Hent appen frem igen, hvis en anden app (fx en besked-notifikation) har taget forgrunden."""
+    try:
+        await c._request_json("POST", f"/session/{c.session_id}/wda/apps/activate", {"bundleId": bundle_id})
+        return True
+    except Exception:
+        return False
+
+
 async def accept_consent(c) -> bool:
     """Hinges privatlivs-vindue dukker op tilfældigt og kan ikke afvises varigt; her accepteres det."""
     return await tap(c, "Jeg er enig")

@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 from logic import human_delay, in_active_hours, load_state, save_state
-from wda import accept_consent, phone, tap, visible
+from wda import accept_consent, activate, phone, tap, visible
 
 HERE = Path(__file__).parent
 STATE, STOP = HERE / "state.json", HERE / "STOP"
@@ -46,6 +46,11 @@ async def ensure_discover(c) -> bool:
     names = {e["name"] for e in await visible(c)}
     if "discover_screen" in names:
         return False
+    if "Hinge" not in names and await activate(c):   # en anden app (fx Messenger) er forrest
+        await asyncio.sleep(2)
+        names = {e["name"] for e in await visible(c)}
+        if "discover_screen" in names:
+            return True
     for back in ("BackButton", "Afslut"):
         if back in names:
             await tap(c, back)
