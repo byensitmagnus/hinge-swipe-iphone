@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import datetime as dt
 import random
+import sys
 import time
 from pathlib import Path
 
@@ -49,11 +50,21 @@ async def ensure_discover(c) -> bool:
 
 async def like_current(c) -> str | None:
     """Like profilen på skærmen. Returnerer navnet på like-knappen, ellers None."""
-    likes = [e["name"] for e in await visible(c) if (e["name"] or "").startswith(LIKE_PREFIX)]
-    if not likes or not await tap(c, likes[0]):
-        return None
-    await asyncio.sleep(random.uniform(1.0, 2.0))
-    return likes[0] if await tap(c, SEND_LIKE) else None   # kommentarfeltet skal være åbent
+    names = [e["name"] or "" for e in await visible(c)]
+    button = "(åbent kommentarfelt)"
+    if SEND_LIKE not in names:   # kommentarfeltet er ikke allerede åbent (fx efter en afbrudt kørsel)
+        likes = [n for n in names if n.startswith(LIKE_PREFIX)]
+        if not likes or not await tap(c, likes[0]):
+            return None
+        button = likes[0]
+        await asyncio.sleep(random.uniform(1.0, 2.0))
+    for _ in range(2):   # tryk 'Send', og tjek at feltet lukkede – ellers tryk igen (første tryk kan ramme midt i tastatur-animationen)
+        if not await tap(c, SEND_LIKE):
+            return None
+        await asyncio.sleep(random.uniform(1.5, 2.5))
+        if SEND_LIKE not in {e["name"] for e in await visible(c)}:
+            return button
+    return None
 
 
 async def read_profile(c) -> None:
@@ -134,6 +145,7 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")   # Windows-konsollen er cp1252 og kan ikke skrive fx dansk/♥
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
