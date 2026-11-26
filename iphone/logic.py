@@ -1,6 +1,8 @@
 """Ren logik uden telefon og netværk: tempo, tidsrum og dagstæller. Alt tilfældigt kommer ind som parameter, så det kan testes."""
+from __future__ import annotations
 import datetime as dt
 import json
+import os
 from pathlib import Path
 
 
@@ -44,4 +46,7 @@ def load_state(path: Path, today: str | None = None) -> dict:
 
 
 def save_state(path: Path, state: dict) -> None:
-    path.write_text(json.dumps(state), encoding="utf-8")
+    """Atomisk: appen læser filen samtidig og må aldrig se en halvskrevet fil."""
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state), encoding="utf-8")
+    os.replace(tmp, path)

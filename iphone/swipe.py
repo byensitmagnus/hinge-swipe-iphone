@@ -6,6 +6,7 @@ Stop:  opret en tom fil med navnet STOP i denne mappe (eller tryk Ctrl+C).
 
 Sikkerhed: trykker aldrig på 'Send en rose' (betalt) – kun 'Send synes godt om'. Sender ingen beskeder.
 """
+from __future__ import annotations
 import argparse
 import asyncio
 import datetime as dt
@@ -166,7 +167,10 @@ async def main() -> None:
                 button = await like_current(c, names, quick)
             if button is None:
                 anomalies += 1
-                shown = " | ".join((e["name"] or "")[:30] for e in (await visible(c))[:12])
+                now = await visible(c)
+                if any(e["name"] == "SBCoverSheetWindow" for e in now):
+                    return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
+                shown = " | ".join((e["name"] or "")[:30] for e in now[:12])
                 log(f"Uventet skærm ({anomalies}/3): {shown}")
                 if anomalies >= 3:
                     return log("For mange uventede skærme – stopper (tjek telefonen).")

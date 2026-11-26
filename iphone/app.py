@@ -3,6 +3,7 @@
 Appen starter swipe.py som en baggrundsproces, viser loggen live og stopper den pænt via STOP-filen.
 Kun lokal adgang (127.0.0.1); ingen ekstra pakker.
 """
+from __future__ import annotations
 import collections
 import json
 import os
@@ -62,7 +63,16 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def local_host(self) -> bool:
+        """Mod DNS-rebinding: kun forespørgsler til 127.0.0.1/localhost på vores port."""
+        if self.headers.get("Host") in (f"127.0.0.1:{PORT}", f"localhost:{PORT}"):
+            return True
+        self.send(403, b'{"error":"forbidden"}')
+        return False
+
     def do_GET(self):
+        if not self.local_host():
+            return
         if self.path == "/":
             return self.send(200, (HERE / "ui.html").read_bytes(), "text/html; charset=utf-8")
         if self.path == "/api/status":
@@ -71,10 +81,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         # Kun samme oprindelse: en anden hjemmeside må ikke kunne starte/stoppe appen.
+        if not self.local_host():
+            return
         origin = self.headers.get("Origin")
         if origin and origin not in (f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"):
             return self.send(403, b'{"error":"forbidden"}')
-        body = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)) or b"{}")
+        try:
+            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)) or b"{}")
+            if not isinstance(body, dict):
+                raise ValueError
+        except ValueError:
+            return self.send(400, b'{"error":"bad json"}')
         with lock:
             if self.path == "/api/start":
                 if running():

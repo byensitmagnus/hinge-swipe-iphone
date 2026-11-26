@@ -16,3 +16,5 @@ iphone/*.log
 .kimi-code/
 *.log
 session.json
+iphone/.venv/
+iphone/state.tmp

@@ -3,6 +3,7 @@
 `phone()` starter WDA-runneren på telefonen, åbner en session i en app og rydder op bagefter.
 Kræver at WebDriverAgentRunner er installeret på telefonen (se docs/index.html).
 """
+from __future__ import annotations
 import asyncio
 import contextlib
 import os
