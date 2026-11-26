@@ -41,6 +41,16 @@ Because it reads button names, it keeps working when Hinge shifts its layout aro
 
 ## Quick start
 
+**Plug and play:** after the one-time phone set-up below, double-click `start.bat` (Windows) or `start.command` (Mac). It installs what it needs and opens the app in your browser: pick a mode, press **Start**, watch the live log and today's count, press **Stop**.
+
+| Mode | Pace | Default cap | Risk |
+|---|---|---|---|
+| **Secure** | 8–18 s between likes, reads most profiles, long breaks | 50/day, 20 min | lowest |
+| **Human** | 5–12 s, reads most profiles, 45–120 s breaks | 80/day, 30 min | normal (default) |
+| **Fast** | ~8 s per like all in, no profile reading, short breaks | 200/day, 2 h | clearly higher ban risk |
+
+Command line instead:
+
 ```powershell
 git clone https://github.com/byensitmagnus/hinge-swipe-iphone.git
 cd hinge-swipe-iphone/iphone
@@ -49,7 +59,9 @@ python make_ipa.py          # builds WebDriverAgentRunner.ipa
 # sign + install it once with Sideloadly (free Apple ID): see the guide
 python swipe.py --dry       # look, don't like
 python swipe.py --max 5     # five likes, then stop
-python swipe.py             # a normal 30-minute session
+python swipe.py             # a normal 30-minute session (human mode)
+python swipe.py --mode secure   # or --mode fast
+python app.py               # the app UI
 ```
 
 Keep the phone **unlocked and in the cable** (set *Settings → Display → Auto-Lock → Never*). Stop any time: create an empty file named `STOP` in `iphone/`, or press Ctrl+C.
@@ -57,8 +69,9 @@ Keep the phone **unlocked and in the cable** (set *Settings → Display → Auto
 ## What it does
 
 - Likes profiles in Hinge's Discover feed, one after another.
-- **Human-like pacing:** 5–12 s between likes, an occasional longer look, a 45–120 s break every 12–25 profiles, some scrolling before each like.
+- **Three modes** (`--mode secure|human|fast`, see the table above). Human is the default: 5–12 s between likes, an occasional longer look, a 45–120 s break every 12–25 profiles, some scrolling before each like.
 - **Cautious defaults:** 80 likes/day, 30-minute sessions, 08:00–23:00 only. All adjustable (`--daily`, `--minutes`, `--from-hour`, `--to-hour`).
+- **Fast path:** fast mode finds the like button directly (~0.2 s) instead of reading the whole screen (~1.7 s), and falls back to the full check when anything looks different.
 - Never taps the paid *Send a Rose*. Never sends messages.
 - Stops on its own at the daily cap, outside the time window, when the phone locks, or after three unrecognised screens in a row.
 - Accepts Hinge's random privacy pop-up so it doesn't block the run.

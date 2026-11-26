@@ -7,7 +7,8 @@ You are helping a person set up **Hinge Auto Swipe**: a Python tool in `iphone/`
 1. `cd iphone && pip install -r requirements.txt`
 2. `python make_ipa.py` builds `WebDriverAgentRunner.ipa`.
 3. The **person** signs and installs it with Sideloadly using their own Apple ID, trusts the developer on the phone, and unlocks the phone. You cannot do these steps and must not ask for their passcode or Apple ID password. Walk them through `docs/index.html`.
-4. Test in this order: `python swipe.py --dry`, then `python swipe.py --max 5`, then a normal run.
+4. Easiest for the person: double-click `start.bat` (Windows) or `start.command` (Mac) to open the app UI (`iphone/app.py`, http://127.0.0.1:8765). Modes: `secure`, `human` (default), `fast` (higher ban risk; tell them).
+5. Command-line test order: `python swipe.py --dry`, then `python swipe.py --max 5`, then a normal run.
 
 ## Hard rules
 

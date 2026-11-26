@@ -1,2 +1,4 @@
 experimental/** linguist-vendored
 docs/** linguist-documentation
+*.command text eol=lf
+*.bat text eol=crlf

@@ -65,9 +65,14 @@ async def phone(bundle_id: str = HINGE):
             await client.unlock()  # låser telefonen sig selv, når der ikke er en kode på den
         await asyncio.sleep(1.5)
 
-        caps = {"bundleId": bundle_id, "shouldTerminateApp": False, "forceAppLaunch": False}
+        # Vent ikke på at appen er "i ro" før hvert tryk/hver skærmlæsning – Hinge animerer konstant, så det koster sekunder pr. kald.
+        caps = {"bundleId": bundle_id, "shouldTerminateApp": False, "forceAppLaunch": False,
+                "shouldWaitForQuiescence": False, "waitForIdleTimeout": 0}
         data = await client._request_json("POST", "/session", {"capabilities": {"alwaysMatch": caps}, "desiredCapabilities": caps})
         client.session_id = data.get("sessionId") or data["value"]["sessionId"]
+        with contextlib.suppress(Exception):
+            await client._request_json("POST", f"/session/{client.session_id}/appium/settings",
+                                       {"settings": {"waitForIdleTimeout": 0, "animationCoolOffTimeout": 0}})
         yield client
     finally:
         task.cancel()
@@ -104,6 +109,19 @@ async def tap(c, name: str) -> bool:
         return True
     except Exception:
         return False
+
+
+async def find(c, using: str, value: str) -> str | None:
+    """Element-id for første match (~0,2 s), eller None. Langt hurtigere end at læse hele skærmen (~1,7 s)."""
+    try:
+        return await c.find_element(using, value, session_id=c.session_id)
+    except Exception:
+        return None
+
+
+async def attribute(c, element: str, name: str) -> str:
+    data = await c._request_json("GET", f"/session/{c.session_id}/element/{element}/attribute/{name}")
+    return data.get("value") or ""
 
 
 async def activate(c, bundle_id: str = HINGE) -> bool:
