@@ -1,0 +1,51 @@
+# Bygger Windows-appen og installeren. Et tag som v2.0.0 lægger filerne på GitHub-releasen af samme navn.
+name: Windows app
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup --no-progress -y }
+
+      - name: Byg (test, PyInstaller, zip, installer)
+        shell: pwsh
+        run: |
+          $version = [regex]::Match((Get-Content iphone/logic.py -Raw), 'VERSION = "([^"]+)"').Groups[1].Value
+          if ($env:GITHUB_REF_TYPE -eq "tag" -and $env:GITHUB_REF_NAME -ne "v$version") { throw "Tagget $env:GITHUB_REF_NAME passer ikke med VERSION $version i iphone/logic.py" }
+          python -m venv packaging\.venv
+          ./packaging/build_windows.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HingeAutoSwipe-windows
+          path: |
+            packaging/dist/*.exe
+            packaging/dist/*.zip
+
+      - name: Læg filerne på releasen
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          gh release view $tag 2>$null | Out-Null
+          if ($LASTEXITCODE) { gh release create $tag --title "Hinge Auto Swipe $tag" --generate-notes }
+          gh release upload $tag (Get-ChildItem packaging/dist/*.exe, packaging/dist/*.zip).FullName --clobber

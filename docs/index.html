@@ -75,22 +75,26 @@
 
   <h2 lang-only="en">What you need</h2><h2 lang-only="da">Det skal du bruge</h2>
   <ul lang-only="en">
-    <li>A Windows 10/11 PC (tested) – macOS and Linux should work too (untested)</li>
-    <li>An iPhone with a USB cable (tested: iPhone with iOS 27.2)</li>
-    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installs Apple's USB driver), <a href="https://www.python.org/downloads/">Python 3.11+</a>, and <a href="https://sideloadly.io">Sideloadly</a> (free)</li>
+    <li>A Windows 10/11 PC (tested) – a Mac works from source (untested)</li>
+    <li>An iPhone with a USB cable (tested: iPhone 17 with iOS 27.2)</li>
+    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installs Apple's USB driver) and <a href="https://sideloadly.io">Sideloadly</a> (free). <a href="https://www.python.org/downloads/">Python 3.11+</a> only if you run from source</li>
     <li>A free Apple ID – no paid developer account needed</li>
   </ul>
   <ul lang-only="da">
-    <li>En Windows 10/11-pc (testet) – macOS og Linux burde virke (utestet)</li>
-    <li>En iPhone med USB-kabel (testet: iPhone med iOS 27.2)</li>
-    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installerer Apples USB-driver), <a href="https://www.python.org/downloads/">Python 3.11+</a> og <a href="https://sideloadly.io">Sideloadly</a> (gratis)</li>
+    <li>En Windows 10/11-pc (testet) – en Mac virker fra kildekoden (utestet)</li>
+    <li>En iPhone med USB-kabel (testet: iPhone 17 med iOS 27.2)</li>
+    <li><a href="https://apps.microsoft.com/detail/9pb2mz1zmb1s">iTunes</a> (installerer Apples USB-driver) og <a href="https://sideloadly.io">Sideloadly</a> (gratis). <a href="https://www.python.org/downloads/">Python 3.11+</a> kun hvis du kører fra kildekoden</li>
     <li>Et gratis Apple-ID – du behøver ikke en betalt udviklerkonto</li>
   </ul>
 
   <h2 lang-only="en">Setup – 6 steps</h2><h2 lang-only="da">Opsætning – 6 trin</h2>
 
   <label class="step"><input type="checkbox"><div>
-    <h3 lang-only="en">1. Get the code</h3><h3 lang-only="da">1. Hent koden</h3>
+    <h3 lang-only="en">1. Install the app</h3><h3 lang-only="da">1. Installér appen</h3>
+    <p lang-only="en"><b>Windows:</b> download <code>HingeAutoSwipe-Setup-….exe</code> from <a href="https://github.com/byensitmagnus/hinge-swipe-iphone/releases/latest">GitHub Releases</a> and run it – no Python, no admin rights. If Windows says <i>Windows protected your PC</i>, click <b>More info → Run anyway</b> (the app isn't code-signed). The app's <b>Setup</b> tab then checks steps 2–6 for you.</p>
+    <p lang-only="da"><b>Windows:</b> hent <code>HingeAutoSwipe-Setup-….exe</code> fra <a href="https://github.com/byensitmagnus/hinge-swipe-iphone/releases/latest">GitHub Releases</a> og kør den – uden Python og uden administrator. Siger Windows <i>Windows beskyttede din pc</i>, så klik <b>Flere oplysninger → Kør alligevel</b> (appen er ikke kodesigneret). Appens fane <b>Opsætning</b> tjekker derefter trin 2–6 for dig.</p>
+    <p lang-only="en"><b>Mac or from source:</b> get the code, then double-click <code>start.command</code> (Mac) or <code>start.bat</code> (Windows) in the project folder:</p>
+    <p lang-only="da"><b>Mac eller fra kildekoden:</b> hent koden, og dobbeltklik så <code>start.command</code> (Mac) eller <code>start.bat</code> (Windows) i projektmappen:</p>
     <pre><code>git clone https://github.com/byensitmagnus/hinge-swipe-iphone.git
 cd hinge-swipe-iphone/iphone
 pip install -r requirements.txt</code></pre>
@@ -98,14 +102,14 @@ pip install -r requirements.txt</code></pre>
 
   <label class="step"><input type="checkbox"><div>
     <h3 lang-only="en">2. Turn on Developer Mode</h3><h3 lang-only="da">2. Slå Developer Mode til</h3>
-    <p lang-only="en">Plug in the iPhone, unlock it and tap <b>Trust</b>. Then: <i>Settings → Privacy &amp; Security → Developer Mode</i> → on. The phone restarts.</p>
-    <p lang-only="da">Sæt iPhonen i, lås den op og tryk <b>Stol på</b>. Derefter: <i>Indstillinger → Anonymitet og sikkerhed → Developer Mode</i> → til. Telefonen genstarter.</p>
+    <p lang-only="en">Plug in the iPhone, unlock it and tap <b>Trust</b>. Then: <i>Settings → Privacy &amp; Security → Developer Mode</i> → on. The phone restarts. Can't see the option? Press <b>Show Developer Mode on the phone</b> in the app's Setup tab first.</p>
+    <p lang-only="da">Sæt iPhonen i, lås den op og tryk <b>Stol på</b>. Derefter: <i>Indstillinger → Anonymitet og sikkerhed → Developer Mode</i> → til. Telefonen genstarter. Kan du ikke se punktet? Tryk først <b>Vis Developer Mode på telefonen</b> under Opsætning i appen.</p>
   </div></label>
 
   <label class="step"><input type="checkbox"><div>
     <h3 lang-only="en">3. Build the test app</h3><h3 lang-only="da">3. Byg testappen</h3>
-    <p lang-only="en">This downloads Appium's official WebDriverAgent and packages it as an <code>.ipa</code>:</p>
-    <p lang-only="da">Det henter Appiums officielle WebDriverAgent og pakker den som en <code>.ipa</code>:</p>
+    <p lang-only="en">In the app: <b>Setup → Get the test app</b>. It downloads Appium's official WebDriverAgent and packages it as <code>WebDriverAgentRunner.ipa</code>; <b>Show the file</b> opens its folder. From source:</p>
+    <p lang-only="da">I appen: <b>Opsætning → Hent testappen</b>. Den henter Appiums officielle WebDriverAgent og pakker den som <code>WebDriverAgentRunner.ipa</code>; <b>Vis filen</b> åbner mappen. Fra kildekoden:</p>
     <pre><code>python make_ipa.py</code></pre>
   </div></label>
 
@@ -125,17 +129,19 @@ pip install -r requirements.txt</code></pre>
     <h3 lang-only="en">6. Swipe</h3><h3 lang-only="da">6. Swipe</h3>
     <p lang-only="en">Keep the iPhone plugged in and unlocked. Open Hinge on the Discover tab, then try it safely first:</p>
     <p lang-only="da">Lad iPhonen sidde i USB og være låst op. Åbn Hinge på Discover-fanen, og prøv det først forsigtigt:</p>
-    <p lang-only="en"><b>Easiest:</b> double-click <code>start.bat</code> (Windows) or <code>start.command</code> (Mac) in the project folder. The app opens in your browser: pick a mode, press <b>Start</b>, follow today's count and the live log, press <b>Stop</b>. Or use the command line:</p>
-    <p lang-only="da"><b>Nemmest:</b> dobbeltklik <code>start.bat</code> (Windows) eller <code>start.command</code> (Mac) i projektmappen. Appen åbner i din browser: vælg tempo, tryk <b>Start</b>, følg dagens tæller og loggen live, tryk <b>Stop</b>. Eller brug kommandolinjen:</p>
+    <p lang-only="en"><b>In the app:</b> press <b>Check connection</b> (it looks, likes nothing), then pick a pace and press <b>Start</b>. Follow today's count, the pace, the ETA and the live log, and press <b>Stop</b> whenever you like. <b>History</b> shows your likes per day. Or use the command line:</p>
+    <p lang-only="da"><b>I appen:</b> tryk <b>Tjek forbindelse</b> (den kigger, liker intet), vælg så tempo og tryk <b>Start</b>. Følg dagens tæller, tempoet, hvornår den er færdig og loggen live, og tryk <b>Stop</b>, når du vil. <b>Historik</b> viser dine likes pr. dag. Eller brug kommandolinjen:</p>
     <pre><code>python swipe.py --dry        # shows what it would do, likes nothing
 python swipe.py --max 5      # five likes, then stops
 python swipe.py              # a normal session (human mode)
 python swipe.py --mode fast  # or --mode secure</code></pre>
-    <p lang-only="en">Stop it any time by creating an empty file called <code>STOP</code> in the <code>iphone</code> folder, or press Ctrl+C.</p>
-    <p lang-only="da">Stop den når som helst ved at oprette en tom fil kaldet <code>STOP</code> i mappen <code>iphone</code>, eller tryk Ctrl+C.</p>
+    <p lang-only="en">On the command line, stop it any time by creating an empty file called <code>STOP</code> in the <code>iphone</code> folder, or press Ctrl+C.</p>
+    <p lang-only="da">På kommandolinjen stopper du den når som helst ved at oprette en tom fil kaldet <code>STOP</code> i mappen <code>iphone</code>, eller tryk Ctrl+C.</p>
   </div></label>
 
   <h2 lang-only="en">Settings</h2><h2 lang-only="da">Indstillinger</h2>
+  <p lang-only="en">In the app it's all under <b>Settings</b>, along with the language, a daily scheduled start and Hinge's button names. On the command line:</p>
+  <p lang-only="da">I appen ligger det hele under <b>Indstillinger</b>, sammen med sprog, en planlagt daglig start og Hinges knapnavne. På kommandolinjen:</p>
   <table>
     <tr><th>Option</th><th lang-only="en">Default</th><th lang-only="da">Standard</th><th lang-only="en">Meaning</th><th lang-only="da">Betydning</th></tr>
     <tr><td><code>--mode</code></td><td>human</td><td></td><td lang-only="en"><code>secure</code> (50/day, slow), <code>human</code> (80/day), <code>fast</code> (200/day, ~8 s per like, clearly higher ban risk)</td><td lang-only="da"><code>secure</code> (50/dag, langsomt), <code>human</code> (80/dag), <code>fast</code> (200/dag, ca. 8 sek. pr. like, tydeligt højere ban-risiko)</td></tr>
@@ -156,14 +162,14 @@ python swipe.py --mode fast  # or --mode secure</code></pre>
     <p lang-only="en">Repeat steps 3–5. With a free Apple ID the signature expires after 7 days – then just repeat step 4.</p>
     <p lang-only="da">Gentag trin 3–5. Med et gratis Apple-ID udløber signaturen efter 7 dage – så gentager du bare trin 4.</p></details>
   <details><summary lang-only="en">The phone is not found</summary><summary lang-only="da">Telefonen findes ikke</summary>
-    <p lang-only="en">Install iTunes (for the USB driver), use a data cable, unlock the phone and tap Trust. Check with <code>python -m pymobiledevice3 usbmux list</code>.</p>
-    <p lang-only="da">Installér iTunes (til USB-driveren), brug et datakabel, lås telefonen op og tryk Stol på. Tjek med <code>python -m pymobiledevice3 usbmux list</code>.</p></details>
+    <p lang-only="en">Install iTunes (for the USB driver; the app says <i>USB driver missing</i> when it isn't there), use a data cable, unlock the phone and tap Trust. From source you can check with <code>python -m pymobiledevice3 usbmux list</code>.</p>
+    <p lang-only="da">Installér iTunes (til USB-driveren; appen skriver <i>USB-driver mangler</i>, når den ikke er der), brug et datakabel, lås telefonen op og tryk Stol på. Fra kildekoden kan du tjekke med <code>python -m pymobiledevice3 usbmux list</code>.</p></details>
   <details><summary lang-only="en">Hinge shows a privacy pop-up again and again</summary><summary lang-only="da">Hinge viser hele tiden et privatlivs-vindue</summary>
-    <p lang-only="en">Hinge shows it at random. The script taps <i>I agree</i> automatically. If you would rather decline it, change <code>accept_consent</code> in <code>wda.py</code>.</p>
-    <p lang-only="da">Hinge viser det tilfældigt. Scriptet trykker automatisk <i>Jeg er enig</i>. Vil du hellere afvise, ændrer du <code>accept_consent</code> i <code>wda.py</code>.</p></details>
+    <p lang-only="en">Hinge shows it at random. The app taps <i>I agree</i> automatically; the button's name is under <b>Settings → Button names</b>.</p>
+    <p lang-only="da">Hinge viser det tilfældigt. Appen trykker automatisk <i>Jeg er enig</i>; knappens navn står under <b>Indstillinger → Knapnavne</b>.</p></details>
   <details><summary lang-only="en">"Unexpected screen" and it stops</summary><summary lang-only="da">"Uventet skærm" og den stopper</summary>
-    <p lang-only="en">Hinge is somewhere the script does not know (a paywall, a pop-up, a different language). The script goes back to Discover on its own and stops after three misses. Button names are Danish; for another language change <code>LIKE_PREFIX</code> and <code>SEND_LIKE</code> in <code>swipe.py</code> – <code>python inspect_screen.py</code> prints the names Hinge uses.</p>
-    <p lang-only="da">Hinge står et sted, scriptet ikke kender (paywall, pop-up, andet sprog). Scriptet går selv tilbage til Discover og stopper efter tre fejl. Knapnavnene er danske; til et andet sprog ændrer du <code>LIKE_PREFIX</code> og <code>SEND_LIKE</code> i <code>swipe.py</code> – <code>python inspect_screen.py</code> viser de navne, Hinge bruger.</p></details>
+    <p lang-only="en">Hinge is somewhere the script does not know (a paywall, a pop-up, a different language). The app goes back to Discover on its own and stops after three misses. The button names are Danish by default; for another language open Discover in Hinge and use <b>Settings → Button names → Read the screen</b>.</p>
+    <p lang-only="da">Hinge står et sted, scriptet ikke kender (paywall, pop-up, andet sprog). Appen går selv tilbage til Discover og stopper efter tre fejl. Knapnavnene er danske som standard; til et andet sprog åbner du Discover i Hinge og bruger <b>Indstillinger → Knapnavne → Aflæs skærmen</b>.</p></details>
 
   <h2 lang-only="en">How it works</h2><h2 lang-only="da">Sådan virker det</h2>
   <p lang-only="en">A small test app (Appium's WebDriverAgent) runs on your iPhone. <a href="https://github.com/doronz88/pymobiledevice3">pymobiledevice3</a> starts it over USB and sends taps and swipes, the same way a UI test would. The real Hinge app does all the talking to Hinge – the script only presses buttons by name.</p>

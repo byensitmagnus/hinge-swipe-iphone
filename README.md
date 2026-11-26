@@ -23,7 +23,8 @@
 
 | You have | Go to |
 |---|---|
-| **An iPhone with Hinge, a USB cable and a PC** | The [setup guide](https://byensitmagnus.github.io/hinge-swipe-iphone/): about 10 minutes, English and Dansk. |
+| **An iPhone with Hinge, a USB cable and a Windows PC** | [Download the app](https://github.com/byensitmagnus/hinge-swipe-iphone/releases/latest) (`HingeAutoSwipe-Setup-….exe`), then follow its **Setup** tab. About 10 minutes. |
+| **A Mac, or you prefer the source** | The [setup guide](https://byensitmagnus.github.io/hinge-swipe-iphone/), English and Dansk. |
 | **A coding agent (Claude Code, Codex, …)** | Point it at this repo and say *"set this up for my iPhone"*. [`AGENTS.md`](AGENTS.md) tells it how. |
 | **Just curious** | Read [How it works](#how-it-works), then [Safety and pacing](#safety-and-pacing). |
 
@@ -41,7 +42,15 @@ Because it reads button names, it keeps working when Hinge shifts its layout aro
 
 ## Quick start
 
-**Plug and play:** after the one-time phone set-up below, double-click `start.bat` (Windows) or `start.command` (Mac). It installs what it needs and opens the app in your browser: pick a mode, press **Start**, watch the live log and today's count, press **Stop**.
+**Windows, plug and play:** download **`HingeAutoSwipe-Setup-….exe`** from [Releases](https://github.com/byensitmagnus/hinge-swipe-iphone/releases/latest) and run it. No Python, no admin rights. Windows may say *"Windows protected your PC"* because the app isn't code-signed: click **More info → Run anyway**.
+
+**Mac or from source:** double-click `start.command` (Mac) or `start.bat` (Windows) in the project folder. It installs what it needs and opens the same app in your browser.
+
+In the app, pick a pace, press **Start**, and watch today's count, the pace, the ETA and the live log. Press **Stop** whenever you like. The other tabs:
+
+- **Setup:** a seven-step checklist that checks the phone for you: cable and trust, Developer Mode, the test app, Sideloadly, Hinge and a connection test.
+- **History:** likes per day, the last 7 and 30 days, and your best day.
+- **Settings:** language (Dansk or English), default pace, allowed hours, your own limits per pace, a daily scheduled start, and Hinge's button names for other languages, read straight off your screen.
 
 | Mode | Pace | Default cap | Risk |
 |---|---|---|---|
@@ -61,10 +70,10 @@ python swipe.py --dry       # look, don't like
 python swipe.py --max 5     # five likes, then stop
 python swipe.py             # a normal 30-minute session (human mode)
 python swipe.py --mode secure   # or --mode fast
-python app.py               # the app UI
+python app.py               # the app UI (opens in your browser when run from source)
 ```
 
-Keep the phone **unlocked and in the cable** (set *Settings → Display → Auto-Lock → Never*). Stop any time: create an empty file named `STOP` in `iphone/`, or press Ctrl+C.
+Keep the phone **unlocked and in the cable** (set *Settings → Display & Brightness → Auto-Lock → Never*). Stop any time: press **Stop** in the app. On the command line, create an empty file named `STOP` in `iphone/`, or press Ctrl+C.
 
 ## What it does
 
@@ -88,23 +97,24 @@ Automating Hinge is **against Hinge's terms**. Your account can be limited or ba
 
 **Can it send messages?** Not yet. Automatic first messages to *new* matches are planned; they need a real new match to build against safely.
 
-**Is my password sent anywhere?** No. Nothing leaves your PC. The script talks to your phone over USB and to nothing else. Read [`swipe.py`](iphone/swipe.py) and [`wda.py`](iphone/wda.py): about 300 lines in total.
+**Is my password sent anywhere?** No. Nothing leaves your PC. The script talks to your phone over USB and to nothing else. Read [`swipe.py`](iphone/swipe.py) and [`wda.py`](iphone/wda.py): a few hundred lines in total. Settings, the daily counter and the test app stay on your PC (`%LOCALAPPDATA%\HingeAutoSwipe` for the installed app).
 
-**It's in Danish?** The button names it looks for are Danish (the tested Hinge language). For another language change two constants in `swipe.py`; `python inspect_screen.py` prints the names Hinge uses on your screen.
+**It's in Danish?** The app speaks Danish and English. Hinge's button names follow your phone's language, and the defaults are Danish. For another language open Discover in Hinge, then go to **Settings → Button names → Read the screen** and click the right names.
 
-**macOS or Linux?** pymobiledevice3 runs there too, so it should work, but only Windows 11 is tested so far. Reports welcome.
+**macOS or Linux?** Run it from source (`start.command` on a Mac). pymobiledevice3 runs there too, so it should work, but only Windows 11 is tested so far. Reports welcome.
 
 **Android?** Not supported. This uses Apple's UI-testing stack.
 
 ## Tested on
 
-Windows 11 · iPhone (iOS 27.2) · Python 3.11 · pymobiledevice3 11.x · Appium WebDriverAgent v16.15.3 · Hinge with a Danish interface.
+Windows 11 · iPhone 17 (iOS 27.2) · Python 3.11 (source) and 3.12 (Windows app) · pymobiledevice3 11.61 · Appium WebDriverAgent v16.15.3 · Hinge with a Danish interface.
 
 ## Repository layout
 
 | Path | What |
 |---|---|
 | `iphone/` | The iPhone swiper (Python): use this |
+| `packaging/` | The Windows app: PyInstaller spec, Inno Setup installer and `build_windows.ps1` |
 | `docs/index.html` | Step-by-step setup guide, English + Dansk |
 | `experimental/rust-api-client/` | Older idea: an unofficial Hinge API client in Rust. Unverified against a real account; kept for reference |
 
@@ -112,6 +122,8 @@ Windows 11 · iPhone (iOS 27.2) · Python 3.11 · pymobiledevice3 11.x · Appium
 cd iphone
 python -m unittest discover -s tests    # unit tests
 ```
+
+Build the Windows app and installer with `powershell -ExecutionPolicy Bypass -File packaging\build_windows.ps1` (needs uv or Python 3.12, and Inno Setup 6). Pushing a `v*` tag builds it on GitHub Actions and attaches the installer to the release.
 
 ## Contributing
 

@@ -4,6 +4,8 @@ You are helping a person set up **Hinge Auto Swipe**: a Python tool in `iphone/`
 
 ## Set-up flow
 
+On Windows the easiest path is the installer from GitHub Releases (`HingeAutoSwipe-Setup-<version>.exe`, no Python needed). Its **Setup** tab checks the phone and builds the `.ipa` itself (steps 1–2); the person still does step 3. From source:
+
 1. `cd iphone && pip install -r requirements.txt`
 2. `python make_ipa.py` builds `WebDriverAgentRunner.ipa`.
 3. The **person** signs and installs it with Sideloadly using their own Apple ID, trusts the developer on the phone, and unlocks the phone. You cannot do these steps and must not ask for their passcode or Apple ID password. Walk them through `docs/index.html`.
@@ -20,6 +22,8 @@ You are helping a person set up **Hinge Auto Swipe**: a Python tool in `iphone/`
 ## Facts that save time
 
 - The screen is 402×874 points. Hinge must stay open: the session is created with `shouldTerminateApp: False`.
-- Buttons are found by accessibility name; they are Danish in the tested setup (`iphone/swipe.py` constants).
+- Buttons are found by accessibility name; they are Danish in the tested setup (`DEFAULT_BUTTONS` in `iphone/logic.py`). The person can change them in the app under Settings → Button names.
+- Settings, the daily counter (`state.json`) and the `.ipa` live in the data folder: `iphone/` when run from source, `%LOCALAPPDATA%\HingeAutoSwipe` for the installed app (`HINGE_DATA_DIR` overrides).
 - Tests: `cd iphone && python -m unittest discover -s tests`.
+- Windows build: `packaging\build_windows.ps1` (PyInstaller + Inno Setup). Pushing a `v*` tag builds it on GitHub Actions and attaches the installer to the release.
 - Auto-Lock must be *Never*, or the run stops with a "phone is locked" message.

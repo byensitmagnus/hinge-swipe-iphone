@@ -3,171 +3,826 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Auto Swipe</title>
+<meta name="color-scheme" content="light dark">
+<title>Hinge Auto Swipe</title>
 <style>
   :root {
-    --bg: #f6f5f2; --card: #ffffff; --ink: #1b1a19; --muted: #6b6864; --line: #e4e1dc;
-    --accent: #6d28d9; --accent-ink: #ffffff; --good: #15803d; --warn: #b45309; --bad: #b91c1c;
-    --logbg: #15141a; --logink: #e7e5ee;
+    --bg: #f5f4f1; --panel: #faf9f7; --card: #ffffff; --ink: #1c1b1a; --muted: #6b6864; --faint: #9a9792;
+    --line: #e6e3de; --soft: #f1efeb; --accent: #ba01c4; --accent-ink: #ffffff; --accent-soft: #f8e6fa;
+    --good: #15803d; --good-soft: #e6f5eb; --warn: #b45309; --warn-soft: #fcf1e1; --bad: #b91c1c; --bad-soft: #fdeceb;
+    --logbg: #17161c; --logink: #e8e6ef; --logmuted: #8f8b9c;
+    --shadow: 0 1px 2px rgba(20, 16, 30, .05), 0 6px 20px rgba(20, 16, 30, .05);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #111015; --card: #1b1a21; --ink: #eeedf2; --muted: #9b98a6; --line: #2c2a34;
-            --accent: #a78bfa; --accent-ink: #15121c; --good: #4ade80; --warn: #fbbf24; --bad: #f87171;
-            --logbg: #0b0a0f; --logink: #d9d6e3; }
+    :root {
+      --bg: #0f0e13; --panel: #13121a; --card: #1a1922; --ink: #eeedf3; --muted: #a19eae; --faint: #6f6c7b;
+      --line: #2a2834; --soft: #22212b; --accent: #d946ef; --accent-ink: #1a0b1d; --accent-soft: #3a1640;
+      --good: #4ade80; --good-soft: #15291d; --warn: #fbbf24; --warn-soft: #2d2412; --bad: #f87171; --bad-soft: #2e1717;
+      --logbg: #0b0a0f; --shadow: none;
+    }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 48px; }
-  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  h1 { font-size: 26px; margin: 0; letter-spacing: -0.02em; }
-  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px;
-          border: 1px solid var(--line); background: var(--card); font-size: 13px; color: var(--muted); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-  .on .dot { background: var(--good); box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 20%, transparent); }
-  .sub { color: var(--muted); margin: 6px 0 24px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* Skal */
+  .shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100%; }
+  .side { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
+  .logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(160deg, #ba01c4, #f0458f); display: grid; place-items: center; color: #fff; flex: none; }
+  .brand b { display: block; font-size: 15px; line-height: 1.2; }
+  .brand small { color: var(--faint); font-size: 12px; }
+  .nav { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; padding: 9px 10px; border-radius: 9px; cursor: pointer; color: var(--muted); text-align: left; }
+  .nav:hover { background: var(--soft); color: var(--ink); }
+  .nav[aria-current="page"] { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+  .nav[aria-current="page"] svg { color: var(--accent); }
+  .nav .count { margin-left: auto; min-width: 20px; height: 20px; border-radius: 99px; background: var(--warn-soft); color: var(--warn); font-size: 12px; font-weight: 700; display: grid; place-items: center; padding: 0 6px; }
+  .spacer { flex: 1; }
+  .device { display: flex; gap: 10px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  .device b { display: block; font-size: 14px; line-height: 1.3; }
+  .device small { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
+  .dot.ok { background: var(--good); box-shadow: 0 0 0 4px var(--good-soft); }
+  .dot.warn { background: var(--warn); box-shadow: 0 0 0 4px var(--warn-soft); }
+  .quit { margin-top: 6px; }
+  svg.i { width: 19px; height: 19px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  main { padding: 34px 40px 56px; min-width: 0; }
+  .view { max-width: 1000px; margin: 0 auto; }
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+  h1 { font-size: 26px; letter-spacing: -0.02em; margin: 0; line-height: 1.2; }
+  .sub { color: var(--muted); margin: 6px 0 0; max-width: 62ch; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 14px; font-weight: 600; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+  .grid { display: grid; gap: 16px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .pill.run { color: var(--ink); border-color: color-mix(in srgb, var(--good) 40%, var(--line)); }
+  .pill.run .dot { animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .pill.run .dot { animation: none; } }
+
+  /* Knapper */
+  .btn { border: 1px solid transparent; border-radius: 11px; padding: 10px 18px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; justify-content: center; transition: filter .15s, background .15s; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn.ghost { background: transparent; border-color: var(--line); }
+  .btn.ghost:hover:not(:disabled) { background: var(--soft); }
+  .btn.danger { background: var(--bad); color: #fff; }
+  .btn.small { padding: 7px 12px; font-size: 13.5px; border-radius: 9px; }
+  .btn.big { padding: 13px 26px; font-size: 16px; }
+  .btn:disabled { opacity: .42; cursor: not-allowed; }
+  a.btn { text-decoration: none; color: var(--ink); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  /* Swipe */
+  .swipe-top { grid-template-columns: 300px 1fr; }
+  .today { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; }
+  .ring { position: relative; width: 168px; height: 168px; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 12; }
+  .ring .track { stroke: var(--soft); }
+  .ring .fill { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .5s ease; }
+  .ring .num { position: absolute; inset: 0; display: grid; place-content: center; }
+  .ring .num b { font-size: 40px; font-weight: 750; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .ring .num span { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .pace { color: var(--muted); font-size: 13px; min-height: 40px; font-variant-numeric: tabular-nums; max-width: 260px; }
   .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  @media (max-width: 640px) { .modes { grid-template-columns: 1fr; } }
-  .mode { text-align: left; border: 1.5px solid var(--line); border-radius: 12px; padding: 14px; background: transparent;
-          color: inherit; font: inherit; cursor: pointer; }
-  .mode:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
-  .mode[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
-  .mode b { display: block; font-size: 16px; }
-  .mode span { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
-  .risk { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; }
-  .low { color: var(--good); } .mid { color: var(--warn); } .high { color: var(--bad); }
-  .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
-  @media (max-width: 640px) { .fields { grid-template-columns: 1fr; } }
-  label { font-size: 13px; color: var(--muted); display: block; }
-  input { width: 100%; margin-top: 4px; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--line);
-          background: var(--bg); color: var(--ink); font: inherit; }
+  .mode { text-align: left; border: 1.5px solid var(--line); border-radius: 13px; padding: 14px; background: transparent; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+  .mode:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .mode[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .mode b { font-size: 16px; }
+  .mode .desc { color: var(--muted); font-size: 13px; line-height: 1.4; }
+  .mode .lim { color: var(--ink); font-size: 12.5px; font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .risk { font-size: 12px; font-weight: 650; margin-top: 2px; }
+  .risk.low { color: var(--good); } .risk.mid { color: var(--warn); } .risk.high { color: var(--bad); }
+  .runbar { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-top: 18px; }
+  .field { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--muted); }
+  .field input, .field select, input.in, select.in { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); min-width: 0; }
+  .summary { color: var(--muted); font-size: 13.5px; margin: 14px 0 0; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-  button.btn { border: 0; border-radius: 10px; padding: 11px 20px; font: inherit; font-weight: 600; cursor: pointer; }
-  .primary { background: var(--accent); color: var(--accent-ink); }
-  .ghost { background: transparent; color: var(--ink); border: 1px solid var(--line) !important; }
-  .danger { background: var(--bad); color: #fff; }
-  button:disabled { opacity: .45; cursor: not-allowed; }
-  .stats { display: flex; align-items: center; gap: 16px; }
-  .big { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-  .bar { flex: 1; height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
-  .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s; }
-  .meta { margin: 10px 0 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  pre { margin: 0; background: var(--logbg); color: var(--logink); border-radius: 10px; padding: 14px;
-        height: 280px; overflow: auto; font: 12.5px/1.55 ui-monospace, "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; }
-  .note { font-size: 13px; color: var(--muted); margin-top: 20px; }
-  .note b { color: var(--ink); }
+  .log { background: var(--logbg); color: var(--logink); border-radius: 12px; padding: 12px 14px; height: 300px; overflow: auto; font: 12.5px/1.6 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  .log .lg { display: flex; gap: 12px; }
+  .log time { color: var(--logmuted); flex: none; }
+  .log .lg-like span::first-letter { color: #f472b6; }
+  .log .lg-start { margin: 10px 0 4px; color: #f0abfc; font-weight: 600; }
+  .log .lg-start:first-child { margin-top: 0; }
+  .log .lg-end { border-top: 1px dashed #3a3746; margin: 8px 0; }
+  .log .empty { color: var(--logmuted); margin: 0; font-family: system-ui, sans-serif; }
+
+  /* Opsætning */
+  .progress { height: 8px; background: var(--soft); border-radius: 99px; overflow: hidden; margin-top: 10px; width: 260px; max-width: 100%; }
+  .progress i { display: block; height: 100%; background: var(--good); width: 0; transition: width .4s; }
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .step { display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: start; }
+  .badge { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--soft); color: var(--muted); }
+  .step.done .badge { background: var(--good-soft); color: var(--good); }
+  .step h3 { margin: 4px 0 4px; font-size: 16px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; max-width: 64ch; }
+  .step .row { margin-top: 10px; }
+  .tag { font-size: 12px; font-weight: 650; padding: 4px 10px; border-radius: 99px; white-space: nowrap; margin-top: 6px; }
+  .tag.done { background: var(--good-soft); color: var(--good); }
+  .tag.todo { background: var(--warn-soft); color: var(--warn); }
+  .tag.manual { background: var(--soft); color: var(--muted); }
+  .ready { background: var(--good-soft); color: var(--good); border-radius: 12px; padding: 12px 16px; font-weight: 600; }
+
+  /* Historik */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .kpi b { display: block; font-size: 30px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .kpi span { color: var(--muted); font-size: 13px; }
+  .kpi small { color: var(--faint); font-size: 12px; display: block; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart .bar { fill: color-mix(in srgb, var(--accent) 55%, transparent); }
+  .chart .bar.today { fill: var(--accent); }
+  .chart .axis { fill: var(--faint); font-size: 10px; font-family: system-ui, sans-serif; }
+  .chart .gridline { stroke: var(--line); stroke-width: 1; }
+
+  /* Indstillinger */
+  .set { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .set:first-of-type { border-top: 0; padding-top: 4px; }
+  .set h3 { margin: 0 0 4px; font-size: 15px; }
+  .set .hint { color: var(--muted); font-size: 13px; margin: 0; }
+  .fields { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  table.limits { border-collapse: collapse; width: 100%; max-width: 520px; }
+  table.limits th { text-align: left; font-size: 12.5px; color: var(--muted); font-weight: 600; padding: 0 8px 8px 0; }
+  table.limits td { padding: 5px 8px 5px 0; }
+  table.limits input { width: 110px; }
+  .over { color: var(--warn); font-size: 12px; font-weight: 600; }
+  .switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+  .switch input { width: 40px; height: 22px; appearance: none; background: var(--line); border-radius: 99px; position: relative; cursor: pointer; transition: background .2s; margin: 0; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .switch input:checked { background: var(--accent); }
+  .switch input:checked::after { transform: translateX(18px); }
+  details.adv summary { cursor: pointer; font-weight: 600; }
+  .btn-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; max-height: 180px; overflow: auto; }
+  .chip { border: 1px solid var(--line); background: var(--soft); border-radius: 8px; padding: 4px 9px; font-size: 12.5px; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); }
+  code.path { background: var(--soft); padding: 4px 8px; border-radius: 7px; font-size: 12.5px; word-break: break-all; }
+
+  /* Om */
+  .about p { max-width: 68ch; }
+  .about ul { padding-left: 20px; margin: 0; }
+  .about li { margin: 6px 0; }
+  .warnbox { background: var(--warn-soft); border-radius: 12px; padding: 14px 16px; color: var(--ink); }
+
+  /* Modal og toast */
+  .modal { position: fixed; inset: 0; background: rgba(10, 8, 16, .55); display: grid; place-items: center; padding: 16px; z-index: 20; }
+  .dialog { background: var(--card); border-radius: 18px; padding: 26px; max-width: 480px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .dialog h2 { text-transform: none; letter-spacing: -0.01em; font-size: 20px; color: var(--ink); margin-bottom: 10px; }
+  .dialog p, .dialog li { color: var(--muted); }
+  .dialog ul { padding-left: 20px; }
+  .dialog .actions { justify-content: flex-end; }
+  .check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 0; cursor: pointer; }
+  .check input { margin-top: 4px; accent-color: var(--accent); }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 30; max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .offline { position: fixed; inset: 0; background: var(--bg); display: grid; place-items: center; text-align: center; z-index: 40; padding: 24px; }
+
+  @media (max-width: 1100px) {
+    .swipe-top { grid-template-columns: 1fr; }
+    .today { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "ring head" "ring pace"; justify-content: start; text-align: left; column-gap: 28px; row-gap: 4px; }
+    .today h2 { grid-area: head; align-self: end; margin: 0; }
+    .today .ring { grid-area: ring; width: 136px; height: 136px; }
+    .today .pace { grid-area: pace; align-self: start; max-width: none; min-height: 0; }
+  }
+  @media (max-width: 980px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .set { grid-template-columns: 1fr; gap: 10px; }
+  }
+  @media (max-width: 760px) {
+    .shell { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+    .brand { padding: 0 8px 0 0; }
+    .brand small, .spacer, .nav span:not(.count) { display: none; }
+    .nav { width: auto; }
+    .device { order: 9; width: 100%; padding: 8px 12px; }
+    .quit { margin: 0; }
+    main { padding: 20px 16px 40px; }
+    .modes, .btn-fields { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 36px 1fr; }
+    .step .tag { grid-column: 2; justify-self: start; margin-top: 0; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <h1>Auto Swipe</h1>
-    <span class="pill" id="state"><span class="dot"></span><span id="stateText">Klar</span></span>
-  </header>
-  <p class="sub">Liker profiler i Hinge på din iPhone over USB. Telefonen skal være låst op, med Hinge åben og Autolås sat til <i>Aldrig</i>.</p>
-
-  <section class="card">
-    <h2>I dag</h2>
-    <div class="stats"><span class="big" id="today">0</span><div class="bar"><i id="bar"></i></div><span id="limit">/ 80</span></div>
-    <p class="meta" id="pace">&nbsp;</p>
-  </section>
-
-  <section class="card">
-    <h2>Tempo</h2>
-    <div class="modes" id="modes">
-      <button class="mode" data-mode="secure"><b>Secure</b><span>Langsomt, læser profiler grundigt, lange pauser.</span><em class="risk low">Lav risiko</em></button>
-      <button class="mode" data-mode="human"><b>Human</b><span>Menneskeligt tempo. Standard.</span><em class="risk mid">Normal risiko</em></button>
-      <button class="mode" data-mode="fast"><b>Fast</b><span>Ca. 8 sek. pr. like, korte pauser.</span><em class="risk high">Høj ban-risiko</em></button>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="currentColor" stroke="none"/></svg></div>
+      <div><b>Hinge Auto Swipe</b><small id="ver"></small></div>
     </div>
-    <div class="fields">
-      <label>Max likes i denne kørsel<input id="max" type="number" min="0" placeholder="ingen grænse"></label>
-      <label>Max likes pr. dag<input id="daily" type="number" min="1"></label>
-      <label>Stop efter (minutter)<input id="minutes" type="number" min="1"></label>
+    <button class="nav" data-view="swipe" aria-current="page"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span data-i18n="nav.swipe"></span></button>
+    <button class="nav" data-view="setup"><svg class="i" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M3.5 6l1.5 1.5L7.5 5M3.5 12l1.5 1.5 2.5-2.5M3.5 18l1.5 1.5 2.5-2.5"/></svg><span data-i18n="nav.setup"></span><span class="count" id="setupCount" hidden></span></button>
+    <button class="nav" data-view="history"><svg class="i" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg><span data-i18n="nav.history"></span></button>
+    <button class="nav" data-view="settings"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span data-i18n="nav.settings"></span></button>
+    <button class="nav" data-view="about"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span data-i18n="nav.about"></span></button>
+    <div class="spacer"></div>
+    <div class="device" id="device" title="">
+      <span class="dot" id="devDot"></span>
+      <div><b id="devName"></b><small id="devSub"></small></div>
     </div>
-    <div class="actions">
-      <button class="btn primary" id="start">Start</button>
-      <button class="btn danger" id="stop" disabled>Stop</button>
-      <button class="btn ghost" id="check">Tjek forbindelse</button>
-    </div>
-  </section>
+    <button class="nav quit" id="quit"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v8M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span data-i18n="quit"></span></button>
+  </aside>
 
-  <section class="card">
-    <h2>Log</h2>
-    <pre id="log">Ingen kørsler endnu.</pre>
-  </section>
+  <main>
+    <!-- SWIPE -->
+    <section class="view" id="view-swipe">
+      <div class="head">
+        <div><h1 data-i18n="nav.swipe"></h1><p class="sub" data-i18n="swipe.sub"></p></div>
+        <span class="pill" id="statePill"><span class="dot" id="stateDot"></span><span id="stateText"></span></span>
+      </div>
+      <div class="grid swipe-top">
+        <div class="card today">
+          <h2 data-i18n="swipe.today"></h2>
+          <div class="ring">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg>
+            <div class="num"><b id="today">0</b><span id="todayOf"></span></div>
+          </div>
+          <div class="pace" id="pace"></div>
+        </div>
+        <div class="card">
+          <h2 data-i18n="swipe.mode"></h2>
+          <div class="modes" id="modes">
+            <button class="mode" data-mode="secure"><b>Secure</b><span class="desc" data-i18n="mode.secure"></span><span class="lim" data-lim="secure"></span><span class="risk low" data-i18n="risk.low"></span></button>
+            <button class="mode" data-mode="human"><b>Human</b><span class="desc" data-i18n="mode.human"></span><span class="lim" data-lim="human"></span><span class="risk mid" data-i18n="risk.mid"></span></button>
+            <button class="mode" data-mode="fast"><b>Fast</b><span class="desc" data-i18n="mode.fast"></span><span class="lim" data-lim="fast"></span><span class="risk high" data-i18n="risk.high"></span></button>
+          </div>
+          <div class="runbar">
+            <label class="field"><span data-i18n="swipe.max"></span><input id="max" type="number" min="1" max="1000" inputmode="numeric" data-i18n-ph="swipe.max_ph" style="width: 170px"></label>
+          </div>
+          <p class="summary" id="summary"></p>
+          <div class="actions">
+            <button class="btn primary big" id="start"><svg class="i" viewBox="0 0 24 24"><path d="M7 5v14l11-7z" fill="currentColor"/></svg><span data-i18n="btn.start"></span></button>
+            <button class="btn danger big" id="stop" disabled><svg class="i" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg><span data-i18n="btn.stop"></span></button>
+            <button class="btn ghost big" id="check" data-i18n="btn.check"></button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 16px">
+        <h2 data-i18n="swipe.log"></h2>
+        <div class="log" id="log" role="log" aria-live="polite"></div>
+      </div>
+    </section>
 
-  <p class="note">Trykker aldrig på <b>Send en rose</b> og sender aldrig beskeder. Automatisering er imod Hinges vilkår, og højere tempo giver større risiko for, at kontoen bliver begrænset eller lukket.</p>
-</main>
+    <!-- OPSÆTNING -->
+    <section class="view" id="view-setup" hidden>
+      <div class="head">
+        <div><h1 data-i18n="nav.setup"></h1><p class="sub" data-i18n="setup.sub"></p></div>
+        <div><span id="setupProgress" class="pill"></span><div class="progress"><i id="setupBar"></i></div></div>
+      </div>
+      <p class="ready" id="setupReady" hidden data-i18n="setup.ready"></p>
+      <div class="steps" id="steps">
+        <div class="card step" data-step="1"><span class="badge">1</span><div><h3 data-i18n="s1.title"></h3><p data-i18n="s1.text"></p>
+          <div class="row"><a class="btn ghost small" href="https://apps.microsoft.com/detail/9pb2mz1zmb1s" target="_blank" rel="noopener" data-i18n="s1.link"></a></div></div><span class="tag"></span></div>
+        <div class="card step" data-step="2"><span class="badge">2</span><div><h3 data-i18n="s2.title"></h3><p data-i18n="s2.text"></p>
+          <div class="row"><button class="btn ghost small" id="devmodeBtn" data-i18n="s2.btn"></button></div></div><span class="tag"></span></div>
+        <div class="card step" data-step="3"><span class="badge">3</span><div><h3 data-i18n="s3.title"></h3><p data-i18n="s3.text"></p>
+          <div class="row"><button class="btn primary small" id="ipaBtn" data-i18n="s3.btn"></button><button class="btn ghost small" id="ipaShow" data-i18n="s3.show" hidden></button></div></div><span class="tag"></span></div>
+        <div class="card step" data-step="4"><span class="badge">4</span><div><h3 data-i18n="s4.title"></h3><p data-i18n="s4.text"></p>
+          <div class="row"><a class="btn ghost small" href="https://sideloadly.io" target="_blank" rel="noopener" data-i18n="s4.link"></a></div></div><span class="tag"></span></div>
+        <div class="card step" data-step="5"><span class="badge">5</span><div><h3 data-i18n="s5.title"></h3><p data-i18n="s5.text"></p></div><span class="tag"></span></div>
+        <div class="card step" data-step="6"><span class="badge">6</span><div><h3 data-i18n="s6.title"></h3><p data-i18n="s6.text"></p></div><span class="tag"></span></div>
+        <div class="card step" data-step="7"><span class="badge">7</span><div><h3 data-i18n="s7.title"></h3><p data-i18n="s7.text"></p><p id="checkResult" style="margin-top:8px"></p>
+          <div class="row"><button class="btn primary small" id="check2" data-i18n="btn.check"></button></div></div><span class="tag"></span></div>
+      </div>
+    </section>
+
+    <!-- HISTORIK -->
+    <section class="view" id="view-history" hidden>
+      <div class="head"><div><h1 data-i18n="nav.history"></h1><p class="sub" data-i18n="history.sub"></p></div></div>
+      <div class="kpis">
+        <div class="card kpi"><span data-i18n="kpi.today"></span><b id="kToday">0</b></div>
+        <div class="card kpi"><span data-i18n="kpi.week"></span><b id="kWeek">0</b></div>
+        <div class="card kpi"><span data-i18n="kpi.month"></span><b id="kMonth">0</b></div>
+        <div class="card kpi"><span data-i18n="kpi.best"></span><b id="kBest">0</b><small id="kBestDate"></small></div>
+      </div>
+      <div class="card chart" style="margin-top: 16px">
+        <h2 data-i18n="history.chart"></h2>
+        <div id="chart"></div>
+      </div>
+    </section>
+
+    <!-- INDSTILLINGER -->
+    <section class="view" id="view-settings" hidden>
+      <div class="head"><div><h1 data-i18n="nav.settings"></h1><p class="sub" data-i18n="settings.sub"></p></div></div>
+      <div class="card">
+        <div class="set"><div><h3 data-i18n="set.general"></h3></div>
+          <div class="fields">
+            <label class="field"><span data-i18n="set.lang"></span><select id="setLang"><option value="da">Dansk</option><option value="en">English</option></select></label>
+            <label class="field"><span data-i18n="set.defmode"></span><select id="setMode"><option value="secure">Secure</option><option value="human">Human</option><option value="fast">Fast</option></select></label>
+          </div></div>
+        <div class="set"><div><h3 data-i18n="set.hours"></h3><p class="hint" data-i18n="set.hours.text"></p></div>
+          <div class="fields">
+            <label class="field"><span data-i18n="set.from"></span><select id="setFrom"></select></label>
+            <label class="field"><span data-i18n="set.to"></span><select id="setTo"></select></label>
+          </div></div>
+        <div class="set"><div><h3 data-i18n="set.limits"></h3><p class="hint" data-i18n="set.limits.text"></p></div>
+          <div><table class="limits"><thead><tr><th></th><th data-i18n="set.daily"></th><th data-i18n="set.minutes"></th><th></th></tr></thead><tbody id="limitRows"></tbody></table></div></div>
+        <div class="set"><div><h3 data-i18n="set.schedule"></h3><p class="hint" data-i18n="set.schedule.text"></p></div>
+          <div class="fields">
+            <label class="switch"><input type="checkbox" id="schedOn"><span data-i18n="set.schedule.on"></span></label>
+            <label class="field"><span data-i18n="set.schedule.time"></span><input type="time" id="schedTime"></label>
+            <label class="field"><span data-i18n="set.schedule.mode"></span><select id="schedMode"><option value="secure">Secure</option><option value="human">Human</option><option value="fast">Fast</option></select></label>
+          </div></div>
+        <div class="set"><div><h3 data-i18n="set.buttons"></h3><p class="hint" data-i18n="set.buttons.text"></p></div>
+          <div>
+            <div class="btn-fields">
+              <label class="field"><span data-i18n="bt.like_prefix"></span><input class="bt" data-key="like_prefix"></label>
+              <label class="field"><span data-i18n="bt.send_like"></span><input class="bt" data-key="send_like"></label>
+              <label class="field"><span data-i18n="bt.consent"></span><input class="bt" data-key="consent"></label>
+              <label class="field"><span data-i18n="bt.close"></span><input class="bt" data-key="close"></label>
+            </div>
+            <div class="row" style="margin-top: 14px"><button class="btn ghost small" id="inspect" data-i18n="set.inspect"></button><button class="btn ghost small" id="btReset" data-i18n="set.buttons.reset"></button></div>
+            <p class="hint" id="namesHint" hidden style="margin-top: 10px" data-i18n="set.inspect.hint"></p>
+            <div class="chips" id="names"></div>
+          </div></div>
+        <div class="set"><div><h3 data-i18n="set.data"></h3><p class="hint" data-i18n="set.data.text"></p></div>
+          <div class="row"><code class="path" id="dataPath"></code><button class="btn ghost small" id="openData" data-i18n="set.data.open"></button></div></div>
+      </div>
+    </section>
+
+    <!-- OM -->
+    <section class="view about" id="view-about" hidden>
+      <div class="head"><div><h1 data-i18n="nav.about"></h1><p class="sub" data-i18n="about.lead"></p></div></div>
+      <div class="grid">
+        <div class="card"><h2 data-i18n="about.safe"></h2><ul><li data-i18n="about.s1"></li><li data-i18n="about.s2"></li><li data-i18n="about.s3"></li></ul></div>
+        <div class="card"><h2 data-i18n="about.terms"></h2><p class="warnbox" data-i18n="about.terms.text" style="margin:0"></p></div>
+        <div class="card"><h2 data-i18n="about.links"></h2>
+          <div class="row"><a class="btn ghost small" href="https://github.com/byensitmagnus/hinge-swipe-iphone" target="_blank" rel="noopener" data-i18n="about.repo"></a>
+          <a class="btn ghost small" href="https://byensitmagnus.github.io/hinge-swipe-iphone/" target="_blank" rel="noopener" data-i18n="about.guide"></a></div>
+          <p class="hint" id="aboutVer" style="margin: 14px 0 0; color: var(--muted)"></p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <h2 id="mTitle"></h2>
+    <div id="mBody"></div>
+    <label class="check" id="mCheckWrap" hidden><input type="checkbox" id="mCheck"><span id="mCheckText"></span></label>
+    <div class="actions"><button class="btn ghost" id="mCancel"></button><button class="btn primary" id="mOk"></button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="offline" id="offline" hidden><div><h1 data-i18n="offline.title"></h1><p class="sub" data-i18n="offline.text"></p></div></div>
+
 <script>
-  const $ = (id) => document.getElementById(id);
-  let mode = "human", modes = {}, lastLog = "";
-  try { mode = localStorage.getItem("mode") || mode; } catch {}
+const I18N = {
+  da: {
+    "nav.swipe": "Swipe", "nav.setup": "Opsætning", "nav.history": "Historik", "nav.settings": "Indstillinger", "nav.about": "Om", "quit": "Afslut",
+    "dev.search": "Leder efter iPhone …", "dev.none": "Ingen iPhone", "dev.none_sub": "Sæt USB-kablet i",
+    "dev.nodriver": "USB-driver mangler", "dev.nodriver_sub": "Installer iTunes – se Opsætning", "dev.unpaired": "iPhone fundet", "dev.unpaired_sub": "Lås op og tryk 'Stol på'", "dev.ios": "iOS {v}",
+    "state.idle": "Klar", "state.swipe": "Kører", "state.check": "Tjekker forbindelsen", "state.ipa": "Henter testappen", "state.inspect": "Aflæser skærmen", "state.stopping": "Stopper …",
+    "swipe.sub": "Liker profiler i Hinge på din iPhone over USB. Hold telefonen låst op med Hinge åben.",
+    "swipe.today": "I dag", "swipe.of": "af {n}", "swipe.mode": "Tempo",
+    "mode.secure": "Langsomt og grundigt, lange pauser.", "mode.human": "Menneskeligt tempo. Standard.", "mode.fast": "Ca. 8 sek. pr. like, korte pauser.",
+    "risk.low": "Lav risiko", "risk.mid": "Normal risiko", "risk.high": "Høj ban-risiko", "mode.lim": "{daily} likes/dag · {minutes} min",
+    "swipe.max": "Max likes i denne kørsel", "swipe.max_ph": "ingen grænse",
+    "swipe.summary": "Stopper ved {daily} likes i dag, efter {minutes} min eller kl. {to}.",
+    "swipe.summary_max": "Stopper efter {max} likes, ved {daily} likes i dag, efter {minutes} min eller kl. {to}.",
+    "btn.start": "Start", "btn.stop": "Stop", "btn.check": "Tjek forbindelse", "swipe.log": "Log",
+    "swipe.log_empty": "Ingen kørsler endnu. Tryk Start, eller tjek forbindelsen først.",
+    "pace.line": "{n} likes i denne kørsel · {s} sek. pr. like", "pace.eta": "{left} tilbage, færdig ca. kl. {t}",
+    "swipe.reached": "Dagens grænse for {mode} er nået. Tælleren starter forfra i morgen.",
+    "swipe.max_bad": "Max skal være et helt tal fra 1 til 1000 – eller tomt for ingen grænse.",
+    "sched.fast": "Den planlagte kørsel starter af sig selv i Fast-tempo hver dag.", "sched.fast_ok": "Brug Fast",
+    "bt.rejected": "Ikke gemt: navnet er for kort eller ligner en betalt knap (rose, boost).",
+    "fast.title": "Kør i Fast-tempo?", "fast.text": "Fast liker mange profiler hurtigt. Det giver markant højere risiko for, at Hinge begrænser eller lukker kontoen.", "fast.ok": "Start Fast", "cancel": "Annuller",
+    "need.device": "Ingen iPhone fundet – se Opsætning.", "busy": "Telefonen er i brug – vent, eller tryk Stop.",
+    "setup.sub": "Gøres én gang. Appen tjekker selv hvert trin, så snart iPhonen er tilsluttet.", "setup.progress": "{done} af {total} trin klar",
+    "step.done": "Klar", "step.todo": "Mangler", "step.manual": "Tjek selv",
+    "s1.title": "Tilslut iPhonen", "s1.text": "Sæt iPhonen i med et USB-datakabel, lås den op, og tryk Stol på, når den spørger. På Windows skal iTunes være installeret – den indeholder Apples USB-driver.", "s1.link": "Hent iTunes",
+    "s2.title": "Slå Developer Mode til", "s2.text": "På iPhonen: Indstillinger → Anonymitet og sikkerhed → Developer Mode → til. Telefonen genstarter; bekræft bagefter. Kan du ikke se punktet, så tryk på knappen herunder først.", "s2.btn": "Vis Developer Mode på telefonen",
+    "s3.title": "Hent testappen", "s3.text": "Appen henter Appiums officielle WebDriverAgent og pakker den som WebDriverAgentRunner.ipa, klar til Sideloadly.", "s3.btn": "Hent testappen", "s3.show": "Vis filen",
+    "s4.title": "Installer den med Sideloadly", "s4.text": "Installer Sideloadly (gratis), træk WebDriverAgentRunner.ipa ind, skriv dit Apple-ID og tryk Start. Adgangskode og 2-faktorkode taster du selv – dit Apple-ID går kun til Apple via Sideloadly, aldrig til denne app.", "s4.link": "Åbn sideloadly.io",
+    "s5.title": "Stol på udvikleren", "s5.text": "På iPhonen: Indstillinger → Generelt → VPN og enhedsstyring → tryk dit Apple-ID → Stol på. Med et gratis Apple-ID skal testappen installeres igen hver 7. dag.",
+    "s6.title": "Gør Hinge klar", "s6.text": "Log ind i Hinge og åbn Discover. Sæt Indstillinger → Skærm og lysstyrke → Autolås → Aldrig, ellers stopper kørslen, når skærmen slukker.",
+    "s7.title": "Test forbindelsen", "s7.text": "Starter testappen og kigger på Hinge-skærmen uden at like nogen.",
+    "s7.ok": "Virker – {n} like-knapper på skærmen.", "s7.ok0": "Virker – men ingen like-knap på skærmen lige nu. Åbn Discover i Hinge.", "s7.fail": "Virkede ikke – se beskeden i loggen under Swipe.",
+    "setup.ready": "Alt er klar. Gå til Swipe og tryk Start.", "devmode.ok": "Kig under Indstillinger → Anonymitet og sikkerhed på telefonen.",
+    "history.sub": "Likes pr. dag, gemt lokalt på denne computer.", "kpi.today": "I dag", "kpi.week": "Sidste 7 dage", "kpi.month": "Sidste 30 dage", "kpi.best": "Bedste dag",
+    "history.chart": "Likes de sidste 30 dage", "history.empty": "Ingen historik endnu – den bygger sig op, når du swiper.",
+    "settings.sub": "Ændringer gemmes med det samme.", "saved": "Gemt",
+    "set.general": "Generelt", "set.lang": "Sprog", "set.defmode": "Tempo",
+    "set.hours": "Tidsrum", "set.hours.text": "Appen liker kun i dette tidsrum (din lokale tid).", "set.from": "Fra", "set.to": "Til",
+    "set.limits": "Grænser pr. tempo", "set.limits.text": "Tomt felt = standard. Højere grænser giver højere risiko for, at kontoen bliver begrænset.",
+    "set.daily": "Likes pr. dag", "set.minutes": "Minutter pr. kørsel", "set.reset": "Nulstil", "set.over": "Over standard",
+    "set.schedule": "Planlægning", "set.schedule.on": "Start automatisk hver dag", "set.schedule.time": "Klokkeslæt", "set.schedule.mode": "Tempo",
+    "set.schedule.text": "Virker kun, mens appen er åben og inden for tidsrummet.",
+    "set.buttons": "Knapnavne (avanceret)", "set.buttons.text": "Hinges knapnavne følger telefonens sprog; standarderne er danske. Bruger din telefon et andet sprog, så åbn Discover i Hinge, tryk Aflæs skærmen, og vælg de rigtige navne.",
+    "bt.like_prefix": "Like-knappen starter med", "bt.send_like": "Send like-knappen", "bt.consent": "Accepter privatliv-knappen", "bt.close": "Luk-knappen",
+    "set.inspect": "Aflæs skærmen", "set.inspect.hint": "Klik på et navn for at sætte det ind i det felt, du sidst klikkede i.", "set.buttons.reset": "Nulstil til dansk",
+    "set.data": "Data", "set.data.text": "Indstillinger, tæller og testappen ligger her.", "set.data.open": "Åbn mappen",
+    "about.lead": "Hinge Auto Swipe styrer den rigtige Hinge-app på din egen iPhone over USB, ligesom en app-test gør. Ingen falsk klient, intet login i denne app.",
+    "about.safe": "Sikkerhed", "about.s1": "Trykker aldrig på Send en rose (betalt) og sender aldrig beskeder.",
+    "about.s2": "Stopper selv ved dagens grænse, uden for tidsrummet, når telefonen låser, og efter tre ukendte skærme i træk.",
+    "about.s3": "Alt kører lokalt. Intet sendes nogen steder hen – kun til din telefon over kablet.",
+    "about.terms": "Vilkår", "about.terms.text": "Automatisering er imod Hinges vilkår. Kontoen kan blive begrænset eller lukket, og intet tempo gør risikoen nul. Brug det på din egen konto og på eget ansvar. Ikke tilknyttet Hinge eller Match Group.",
+    "about.links": "Links", "about.repo": "Kildekode på GitHub", "about.guide": "Opsætningsguide", "about.ver": "Version {v} · MIT-licens · Data: {p}",
+    "terms.title": "Før du starter", "terms.b1": "Automatisering er imod Hinges vilkår. Kontoen kan blive begrænset eller lukket.", "terms.b2": "Brug det kun på din egen konto.",
+    "terms.b3": "Appen sender aldrig beskeder og trykker aldrig på betalte knapper.", "terms.check": "Jeg forstår og bruger appen på eget ansvar", "terms.ok": "Fortsæt",
+    "quit.title": "Afslut appen?", "quit.busy": "En kørsel er i gang. Den stopper pænt, når appen lukker.", "quit.ok": "Afslut",
+    "offline.title": "Appen er lukket", "offline.text": "Du kan lukke dette vindue. Start appen igen for at fortsætte.",
+  },
+  en: {
+    "nav.swipe": "Swipe", "nav.setup": "Setup", "nav.history": "History", "nav.settings": "Settings", "nav.about": "About", "quit": "Quit",
+    "dev.search": "Looking for iPhone …", "dev.none": "No iPhone", "dev.none_sub": "Plug in the USB cable",
+    "dev.nodriver": "USB driver missing", "dev.nodriver_sub": "Install iTunes – see Setup", "dev.unpaired": "iPhone found", "dev.unpaired_sub": "Unlock and tap 'Trust'", "dev.ios": "iOS {v}",
+    "state.idle": "Ready", "state.swipe": "Running", "state.check": "Checking connection", "state.ipa": "Downloading test app", "state.inspect": "Reading the screen", "state.stopping": "Stopping …",
+    "swipe.sub": "Likes profiles in Hinge on your iPhone over USB. Keep the phone unlocked with Hinge open.",
+    "swipe.today": "Today", "swipe.of": "of {n}", "swipe.mode": "Pace",
+    "mode.secure": "Slow and thorough, long breaks.", "mode.human": "Human pace. The default.", "mode.fast": "About 8 s per like, short breaks.",
+    "risk.low": "Low risk", "risk.mid": "Normal risk", "risk.high": "High ban risk", "mode.lim": "{daily} likes/day · {minutes} min",
+    "swipe.max": "Max likes this run", "swipe.max_ph": "no limit",
+    "swipe.summary": "Stops at {daily} likes today, after {minutes} min or at {to}.",
+    "swipe.summary_max": "Stops after {max} likes, at {daily} likes today, after {minutes} min or at {to}.",
+    "btn.start": "Start", "btn.stop": "Stop", "btn.check": "Check connection", "swipe.log": "Log",
+    "swipe.log_empty": "No runs yet. Press Start, or check the connection first.",
+    "pace.line": "{n} likes this run · {s} s per like", "pace.eta": "{left} to go, done around {t}",
+    "swipe.reached": "Today's limit for {mode} is reached. The counter starts over tomorrow.",
+    "swipe.max_bad": "Max must be a whole number from 1 to 1000 – or empty for no limit.",
+    "sched.fast": "The scheduled run will start by itself at Fast pace every day.", "sched.fast_ok": "Use Fast",
+    "bt.rejected": "Not saved: the name is too short or looks like a paid button (rose, boost).",
+    "fast.title": "Run at Fast pace?", "fast.text": "Fast likes many profiles quickly. It clearly raises the risk that Hinge limits or bans the account.", "fast.ok": "Start Fast", "cancel": "Cancel",
+    "need.device": "No iPhone found – see Setup.", "busy": "The phone is busy – wait, or press Stop.",
+    "setup.sub": "Done once. The app checks each step by itself as soon as the iPhone is connected.", "setup.progress": "{done} of {total} steps done",
+    "step.done": "Done", "step.todo": "To do", "step.manual": "Check yourself",
+    "s1.title": "Connect the iPhone", "s1.text": "Plug the iPhone in with a USB data cable, unlock it and tap Trust when it asks. On Windows, iTunes must be installed – it contains Apple's USB driver.", "s1.link": "Get iTunes",
+    "s2.title": "Turn on Developer Mode", "s2.text": "On the iPhone: Settings → Privacy & Security → Developer Mode → on. The phone restarts; confirm afterwards. Can't see it? Press the button below first.", "s2.btn": "Show Developer Mode on the phone",
+    "s3.title": "Get the test app", "s3.text": "The app downloads Appium's official WebDriverAgent and packages it as WebDriverAgentRunner.ipa, ready for Sideloadly.", "s3.btn": "Get the test app", "s3.show": "Show the file",
+    "s4.title": "Install it with Sideloadly", "s4.text": "Install Sideloadly (free), drag WebDriverAgentRunner.ipa in, enter your Apple ID and press Start. Type the password and 2-factor code yourself – your Apple ID only goes to Apple through Sideloadly, never to this app.", "s4.link": "Open sideloadly.io",
+    "s5.title": "Trust the developer", "s5.text": "On the iPhone: Settings → General → VPN & Device Management → tap your Apple ID → Trust. With a free Apple ID, reinstall the test app every 7 days.",
+    "s6.title": "Get Hinge ready", "s6.text": "Sign in to Hinge and open Discover. Set Settings → Display & Brightness → Auto-Lock → Never, or the run stops when the screen turns off.",
+    "s7.title": "Test the connection", "s7.text": "Starts the test app and looks at the Hinge screen without liking anyone.",
+    "s7.ok": "Works – {n} like buttons on screen.", "s7.ok0": "Works – but no like button on screen right now. Open Discover in Hinge.", "s7.fail": "Didn't work – see the message in the log under Swipe.",
+    "setup.ready": "All set. Go to Swipe and press Start.", "devmode.ok": "Look under Settings → Privacy & Security on the phone.",
+    "history.sub": "Likes per day, stored locally on this computer.", "kpi.today": "Today", "kpi.week": "Last 7 days", "kpi.month": "Last 30 days", "kpi.best": "Best day",
+    "history.chart": "Likes over the last 30 days", "history.empty": "No history yet – it builds up as you swipe.",
+    "settings.sub": "Changes are saved right away.", "saved": "Saved",
+    "set.general": "General", "set.lang": "Language", "set.defmode": "Pace",
+    "set.hours": "Allowed hours", "set.hours.text": "The app only likes within these hours (your local time).", "set.from": "From", "set.to": "To",
+    "set.limits": "Limits per pace", "set.limits.text": "Empty = default. Higher limits raise the risk that the account gets limited.",
+    "set.daily": "Likes per day", "set.minutes": "Minutes per run", "set.reset": "Reset", "set.over": "Above default",
+    "set.schedule": "Schedule", "set.schedule.on": "Start automatically every day", "set.schedule.time": "Time", "set.schedule.mode": "Pace",
+    "set.schedule.text": "Only works while the app is open, and within the allowed hours.",
+    "set.buttons": "Button names (advanced)", "set.buttons.text": "Hinge's button names follow the phone's language; the defaults are Danish. If your phone uses another language, open Discover in Hinge, press Read the screen and pick the right names.",
+    "bt.like_prefix": "Like button starts with", "bt.send_like": "Send like button", "bt.consent": "Accept privacy button", "bt.close": "Close button",
+    "set.inspect": "Read the screen", "set.inspect.hint": "Click a name to put it in the field you clicked last.", "set.buttons.reset": "Reset to Danish",
+    "set.data": "Data", "set.data.text": "Settings, counter and the test app are stored here.", "set.data.open": "Open folder",
+    "about.lead": "Hinge Auto Swipe drives the real Hinge app on your own iPhone over USB, the way an app's UI test does. No fake client, no login in this app.",
+    "about.safe": "Safety", "about.s1": "Never taps Send a Rose (paid) and never sends messages.",
+    "about.s2": "Stops by itself at the daily limit, outside the allowed hours, when the phone locks, and after three unknown screens in a row.",
+    "about.s3": "Everything runs locally. Nothing is sent anywhere – only to your phone over the cable.",
+    "about.terms": "Terms", "about.terms.text": "Automating Hinge is against Hinge's terms. The account can be limited or banned, and no pace makes that risk zero. Use it on your own account, at your own risk. Not affiliated with Hinge or Match Group.",
+    "about.links": "Links", "about.repo": "Source code on GitHub", "about.guide": "Setup guide", "about.ver": "Version {v} · MIT licence · Data: {p}",
+    "terms.title": "Before you start", "terms.b1": "Automating Hinge is against Hinge's terms. The account can be limited or banned.", "terms.b2": "Only use it on your own account.",
+    "terms.b3": "The app never sends messages and never taps paid buttons.", "terms.check": "I understand and use the app at my own risk", "terms.ok": "Continue",
+    "quit.title": "Quit the app?", "quit.busy": "A run is in progress. It stops cleanly when the app closes.", "quit.ok": "Quit",
+    "offline.title": "The app is closed", "offline.text": "You can close this window. Start the app again to continue.",
+  },
+};
 
-  function pick(m) {
-    mode = m;
-    try { localStorage.setItem("mode", m); } catch {}
-    document.querySelectorAll(".mode").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
-    if (modes[m]) { $("daily").placeholder = modes[m].daily; $("minutes").placeholder = modes[m].minutes; }
-    render(window.lastStatus);
+const $ = (id) => document.getElementById(id);
+const MODE_NAMES = { secure: "Secure", human: "Human", fast: "Fast" };
+let S = null, D = null, lang = "da", view = "swipe", stopping = false, logKey = "", namesKey = "", lastField = null, filled = false;
+
+function t(key, vars = {}) {
+  const s = (I18N[lang] && I18N[lang][key]) ?? I18N.da[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function toast(text) {
+  const el = $("toast"); el.textContent = text; el.classList.add("show");
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+function applyI18n() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+}
+
+async function api(path, body) {
+  const opts = body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const r = await fetch(path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    if (data.error === "busy") toast(t("busy"));
+    if (data.error === "terms") openTerms();
+    throw Object.assign(new Error(data.error || r.status), { data });
   }
+  if (data && data.log) { S = data; render(); }
+  return data;
+}
 
-  function render(s) {
-    if (!s) return;
-    const limit = Number($("daily").value) || modes[mode]?.daily || 80;
-    $("today").textContent = s.likes_today;
-    $("limit").textContent = "/ " + limit;
-    $("bar").style.width = Math.min(100, s.likes_today / limit * 100) + "%";
-    $("state").classList.toggle("on", s.running);
-    $("stateText").textContent = s.running ? "Kører" : "Klar";
-    $("start").disabled = $("check").disabled = s.running;
-    $("stop").disabled = !s.running;
-    $("pace").innerHTML = pace(s, limit) || "&nbsp;";
-    const text = s.log.join("\n") || "Ingen kørsler endnu.";
-    if (text !== lastLog) {
-      const el = $("log"), atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
-      el.textContent = lastLog = text;
-      if (atEnd) el.scrollTop = el.scrollHeight;
+/* ---------- Modal ---------- */
+function ask({ title, body, ok, cancel = t("cancel"), check = null }) {
+  return new Promise((resolve) => {
+    $("mTitle").textContent = title; $("mBody").innerHTML = body;
+    $("mOk").textContent = ok; $("mCancel").textContent = cancel; $("mCancel").hidden = cancel === null;
+    $("mCheckWrap").hidden = !check; $("mCheck").checked = false; $("mCheckText").textContent = check || "";
+    $("mOk").disabled = !!check;
+    $("modal").hidden = false; $("mOk").focus();
+    const done = (v) => { $("modal").hidden = true; $("mOk").onclick = $("mCancel").onclick = $("mCheck").onchange = null; resolve(v); };
+    $("mCheck").onchange = () => { $("mOk").disabled = !$("mCheck").checked; };
+    $("mOk").onclick = () => done(true); $("mCancel").onclick = () => done(false);
+  });
+}
+async function openTerms() {
+  if (!$("modal").hidden) return;
+  const body = `<ul><li>${esc(t("terms.b1"))}</li><li>${esc(t("terms.b2"))}</li><li>${esc(t("terms.b3"))}</li></ul>`;
+  if (await ask({ title: t("terms.title"), body, ok: t("terms.ok"), cancel: null, check: t("terms.check") })) {
+    await api("/api/settings", { accepted_terms: true });
+  }
+}
+
+/* ---------- Navigation ---------- */
+function show(name) {
+  view = name;
+  document.querySelectorAll(".nav[data-view]").forEach((b) => b.setAttribute("aria-current", b.dataset.view === name ? "page" : "false"));
+  document.querySelectorAll(".view").forEach((v) => { v.hidden = v.id !== "view-" + name; });
+  try { localStorage.setItem("view", name); } catch {}
+  render();
+}
+
+/* ---------- Render ---------- */
+function runningMode() {
+  return S.task === "swipe" && S.run && S.modes[S.run.mode] ? S.run.mode : S.settings.mode;
+}
+function render() {
+  if (!S) return;
+  if (S.task === null) stopping = false;
+  renderTop(); renderDevice(); renderSwipe(); renderSetup();
+  if (view === "history") renderHistory();
+  renderNames();
+}
+function renderTop() {
+  $("ver").textContent = "v" + S.version;
+  const pill = $("statePill"), busy = S.task !== null;
+  pill.classList.toggle("run", busy);
+  $("stateDot").className = "dot" + (busy ? " ok" : "");
+  $("stateText").textContent = stopping && busy ? t("state.stopping") : t("state." + (S.task || "idle"));
+}
+function renderDevice() {
+  const dot = $("devDot");
+  if (!D) { dot.className = "dot"; $("devName").textContent = t("dev.search"); $("devSub").textContent = ""; }
+  else if (D.error === "no_driver") { dot.className = "dot warn"; $("devName").textContent = t("dev.nodriver"); $("devSub").textContent = t("dev.nodriver_sub"); }
+  else if (!D.connected) { dot.className = "dot"; $("devName").textContent = t("dev.none"); $("devSub").textContent = t("dev.none_sub"); }
+  else if (!D.paired) { dot.className = "dot warn"; $("devName").textContent = t("dev.unpaired"); $("devSub").textContent = t("dev.unpaired_sub"); }
+  else { dot.className = "dot ok"; $("devName").textContent = D.model || D.name || "iPhone"; $("devSub").textContent = t("dev.ios", { v: D.ios || "?" }); }
+}
+function renderSwipe() {
+  const mode = runningMode(), [daily, minutes] = S.limits[mode];
+  document.querySelectorAll(".mode").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  document.querySelectorAll("[data-lim]").forEach((el) => { const [d, m] = S.limits[el.dataset.lim]; el.textContent = t("mode.lim", { daily: d, minutes: m }); });
+  $("today").textContent = S.likes_today;
+  $("todayOf").textContent = t("swipe.of", { n: daily });
+  const reached = S.likes_today >= daily;
+  $("ringFill").style.strokeDashoffset = 326.7 * (1 - Math.min(1, S.likes_today / Math.max(1, daily)));
+  $("ringFill").style.stroke = reached ? "var(--good)" : "";
+  $("pace").textContent = pace(mode) || (reached && S.task !== "swipe" ? t("swipe.reached", { mode: MODE_NAMES[mode] }) : "");
+  const max = runMax(), to = String(S.settings.to_hour).padStart(2, "0") + ":00";
+  $("summary").textContent = max === null ? t("swipe.max_bad") : max ? t("swipe.summary_max", { max, daily, minutes, to }) : t("swipe.summary", { daily, minutes, to });
+  $("summary").style.color = max === null ? "var(--bad)" : "";
+  const busy = S.task !== null;
+  $("start").disabled = busy || max === null;
+  $("check").disabled = busy;
+  $("stop").disabled = !(busy && S.task !== "ipa") || stopping;
+  document.querySelectorAll(".mode").forEach((b) => { b.disabled = busy; });
+  renderLog();
+}
+function runMax() {   // 0 = ingen grænse, null = ugyldigt (samme regel som serveren: helt tal 1–1000)
+  const v = $("max").value.trim();
+  if (!v) return 0;
+  return /^\d+$/.test(v) && +v >= 1 && +v <= 1000 ? +v : null;
+}
+function pace(mode) {
+  const L = S.log, start = L.map((l) => l.startsWith("── ▶")).lastIndexOf(true);
+  const times = L.slice(start + 1).filter((l) => l.includes("♥")).map((l) => {
+    const [h, m, s] = l.slice(0, 8).split(":").map(Number); return h * 3600 + m * 60 + s;
+  });
+  if (times.length < 3) return "";
+  let span = times.at(-1) - times[0]; if (span < 0) span += 86400;
+  const per = span / (times.length - 1);
+  let text = t("pace.line", { n: times.length, s: per.toFixed(1) });
+  let left = S.limits[mode][0] - S.likes_today;
+  if (S.run && S.run.max) left = Math.min(left, S.run.max - times.length);
+  if (S.task === "swipe" && left > 0) {
+    const eta = new Date(Date.now() + left * per * 1000);
+    text += " · " + t("pace.eta", { left, t: eta.toTimeString().slice(0, 5) });
+  }
+  return text;
+}
+function renderLog() {
+  const key = S.log.length + "|" + (S.log.at(-1) || "") + lang;
+  if (key === logKey) return;
+  logKey = key;
+  const el = $("log"), atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 30;
+  el.innerHTML = S.log.length ? S.log.map((line) => {
+    if (line.startsWith("── ▶")) { const label = line.slice(5).trim(); return `<div class="lg-start">▶ ${esc(MODE_NAMES[label] || label)}</div>`; }
+    if (line.startsWith("── ■")) return `<div class="lg-end"></div>`;
+    const time = line.slice(0, 8), rest = line.slice(8).trim();
+    return `<div class="lg${rest.startsWith("♥") ? " lg-like" : ""}"><time>${esc(time)}</time><span>${esc(rest)}</span></div>`;
+  }).join("") : `<p class="empty">${esc(t("swipe.log_empty"))}</p>`;
+  if (atEnd) el.scrollTop = el.scrollHeight;
+}
+function setupSteps() {
+  const ok = S.check && S.check.ok === true;
+  return [
+    { n: 1, done: !!(D && D.connected && D.paired) },
+    { n: 2, done: !!(D && D.developer_mode) },
+    { n: 3, done: !!(S.ipa || (D && D.wda)) },
+    { n: 4, done: !!(D && D.wda) },
+    { n: 5, done: ok, manual: !ok },
+    { n: 6, done: !!(D && D.hinge) && ok, manual: !!(D && D.hinge) && !ok },
+    { n: 7, done: ok },
+  ];
+}
+function renderSetup() {
+  if (!S) return;
+  const steps = setupSteps(), done = steps.filter((s) => s.done).length;
+  steps.forEach((s) => {
+    const el = document.querySelector(`.step[data-step="${s.n}"]`), tag = el.querySelector(".tag");
+    el.classList.toggle("done", s.done);
+    el.querySelector(".badge").textContent = s.done ? "✓" : s.n;
+    tag.className = "tag " + (s.done ? "done" : s.manual ? "manual" : "todo");
+    tag.textContent = t(s.done ? "step.done" : s.manual ? "step.manual" : "step.todo");
+  });
+  $("setupProgress").textContent = t("setup.progress", { done, total: steps.length });
+  $("setupBar").style.width = (done / steps.length * 100) + "%";
+  $("setupReady").hidden = done !== steps.length;
+  const left = steps.length - done;
+  $("setupCount").hidden = left === 0; $("setupCount").textContent = left;
+  $("ipaShow").hidden = !S.ipa;
+  const busy = S.task !== null;
+  $("ipaBtn").disabled = $("check2").disabled = busy;
+  $("devmodeBtn").disabled = !(D && D.paired);
+  const c = S.check;
+  $("checkResult").textContent = !c ? "" : c.ok ? (c.found ? t("s7.ok", { n: c.found }) : t("s7.ok0")) : t("s7.fail");
+  $("checkResult").style.color = !c ? "" : c.ok ? "var(--good)" : "var(--bad)";
+}
+function lastDays(n) {
+  const out = [], base = new Date(S.today + "T12:00:00");
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(base); d.setDate(d.getDate() - i);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    out.push({ iso, d, v: iso === S.today ? S.likes_today : (S.history[iso] || 0) });
+  }
+  return out;
+}
+function fmtDate(d) { return d.toLocaleDateString(lang === "da" ? "da-DK" : "en-GB", { day: "numeric", month: "short" }); }
+function renderHistory() {
+  const days = lastDays(30), sum = (a) => a.reduce((x, y) => x + y.v, 0);
+  $("kToday").textContent = S.likes_today;
+  $("kWeek").textContent = sum(days.slice(-7));
+  $("kMonth").textContent = sum(days);
+  const all = Object.entries({ ...S.history, [S.today]: S.likes_today });
+  const best = all.reduce((b, e) => (e[1] > b[1] ? e : b), ["", 0]);
+  $("kBest").textContent = best[1];
+  $("kBestDate").textContent = best[0] ? fmtDate(new Date(best[0] + "T12:00:00")) : "";
+  const max = Math.max(...days.map((d) => d.v));
+  if (!max) { $("chart").innerHTML = `<p class="hint" style="color:var(--muted);margin:0">${esc(t("history.empty"))}</p>`; return; }
+  const W = 640, H = 210, L = 34, B = 24, top = 10, step = (W - L) / days.length, bw = Math.max(4, step - 5);
+  const nice = Math.ceil(max / 10) * 10 || 10, y = (v) => H - B - (v / nice) * (H - B - top);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("history.chart"))}">`;
+  [0, nice / 2, nice].forEach((v) => { svg += `<line class="gridline" x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`; });
+  days.forEach((d, i) => {
+    const x = L + i * step + (step - bw) / 2, h = Math.max(d.v ? 2 : 0, H - B - y(d.v));
+    svg += `<rect class="bar${d.iso === S.today ? " today" : ""}" x="${x}" y="${H - B - h}" width="${bw}" height="${h}" rx="2"><title>${esc(fmtDate(d.d))}: ${d.v}</title></rect>`;
+    if (i % 5 === 4 || i === days.length - 1) svg += `<text class="axis" x="${x + bw / 2}" y="${H - 7}" text-anchor="middle">${esc(fmtDate(d.d))}</text>`;
+  });
+  $("chart").innerHTML = svg + "</svg>";
+}
+function renderNames() {
+  const key = S.names.join("|");
+  if (key === namesKey) return;
+  namesKey = key;
+  const names = S.names.filter((n) => !/\b(roses?|roser|rosa|boost)\b/i.test(n));   // betalte knapper kan aldrig vælges
+  $("namesHint").hidden = !names.length;
+  $("names").innerHTML = names.map((n) => `<button class="chip" type="button">${esc(n)}</button>`).join("");
+}
+
+/* ---------- Indstillinger ---------- */
+function fillSettings() {
+  const s = S.settings;
+  $("setLang").value = s.lang; $("setMode").value = s.mode;
+  $("setFrom").innerHTML = Array.from({ length: 24 }, (_, h) => `<option value="${h}">${String(h).padStart(2, "0")}:00</option>`).join("");
+  $("setTo").innerHTML = Array.from({ length: 24 }, (_, h) => `<option value="${h + 1}">${String(h + 1).padStart(2, "0")}:00</option>`).join("");
+  $("setFrom").value = s.from_hour; $("setTo").value = s.to_hour;
+  $("limitRows").innerHTML = Object.keys(S.modes).map((m) => {
+    const own = s.limits[m] || {};
+    return `<tr><td><b>${MODE_NAMES[m]}</b></td>
+      <td><input class="in lim" type="number" min="1" max="1000" data-mode="${m}" data-key="daily" value="${own.daily ?? ""}" placeholder="${S.modes[m].daily}"></td>
+      <td><input class="in lim" type="number" min="1" max="720" data-mode="${m}" data-key="minutes" value="${own.minutes ?? ""}" placeholder="${S.modes[m].minutes}"></td>
+      <td><span class="over" data-over="${m}"></span></td></tr>`;
+  }).join("");
+  markOver();
+  $("schedOn").checked = s.schedule.enabled; $("schedTime").value = s.schedule.time; $("schedMode").value = s.schedule.mode;
+  document.querySelectorAll(".bt").forEach((el) => { el.value = s.buttons[el.dataset.key]; });
+  $("dataPath").textContent = S.data_dir;
+  $("aboutVer").textContent = t("about.ver", { v: S.version, p: S.data_dir });
+}
+function markOver() {
+  Object.keys(S.modes).forEach((m) => {
+    const over = [...document.querySelectorAll(`.lim[data-mode="${m}"]`)].some((el) => el.value && Number(el.value) > S.modes[m][el.dataset.key]);
+    document.querySelector(`[data-over="${m}"]`).textContent = over ? t("set.over") : "";
+  });
+}
+async function save(part) {
+  try { await api("/api/settings", part); toast(t("saved")); } catch {}
+}
+
+/* ---------- Hændelser ---------- */
+document.querySelectorAll(".nav[data-view]").forEach((b) => { b.onclick = () => show(b.dataset.view); });
+document.querySelectorAll(".mode").forEach((b) => { b.onclick = () => { if (S && S.settings.mode !== b.dataset.mode) save({ mode: b.dataset.mode }); }; });
+$("max").oninput = () => render();
+$("start").onclick = async () => {
+  if (!S.settings.accepted_terms) return openTerms();
+  if (D && !D.connected) { toast(t("need.device")); return; }
+  const mode = S.settings.mode;
+  if (mode === "fast" && !(await ask({ title: t("fast.title"), body: `<p>${esc(t("fast.text"))}</p>`, ok: t("fast.ok") }))) return;
+  stopping = false;
+  try { await api("/api/start", { mode, max: runMax() || null }); } catch {}
+};
+$("stop").onclick = async () => { stopping = true; render(); try { await api("/api/stop", {}); } catch {} };
+$("check").onclick = $("check2").onclick = async () => { try { await api("/api/check", {}); } catch {} };
+$("ipaBtn").onclick = async () => { try { await api("/api/ipa", {}); } catch {} };
+$("ipaShow").onclick = () => api("/api/open", { what: "ipa" }).catch(() => {});
+$("openData").onclick = () => api("/api/open", { what: "data" }).catch(() => {});
+$("devmodeBtn").onclick = async () => {
+  try { const r = await api("/api/devmode", {}); toast(r.ok ? t("devmode.ok") : r.error); } catch {}
+};
+$("quit").onclick = async () => {
+  if (S && S.task && !(await ask({ title: t("quit.title"), body: `<p>${esc(t("quit.busy"))}</p>`, ok: t("quit.ok") }))) return;
+  try { await api("/api/quit", {}); } catch {}
+  setTimeout(() => { $("offline").hidden = false; }, 600);
+};
+$("setLang").onchange = async (e) => { lang = e.target.value; await save({ lang }); applyI18n(); fillSettings(); logKey = ""; render(); };
+$("setMode").onchange = (e) => save({ mode: e.target.value });
+$("setFrom").onchange = $("setTo").onchange = () => save({ from_hour: Number($("setFrom").value), to_hour: Number($("setTo").value) });
+$("limitRows").addEventListener("change", () => {
+  const limits = {};
+  document.querySelectorAll(".lim").forEach((el) => { if (el.value) (limits[el.dataset.mode] ||= {})[el.dataset.key] = Number(el.value); });
+  markOver(); save({ limits });
+});
+const saveSchedule = () => save({ schedule: { enabled: $("schedOn").checked, time: $("schedTime").value || "18:00", mode: $("schedMode").value } });
+$("schedOn").onchange = $("schedTime").onchange = saveSchedule;
+$("schedMode").onchange = async () => {   // en planlagt kørsel starter uden dig: bekræft Fast her i stedet for ved Start
+  if ($("schedMode").value === "fast" && !(await ask({ title: t("fast.title"), body: `<p>${esc(t("fast.text"))}</p><p>${esc(t("sched.fast"))}</p>`, ok: t("sched.fast_ok") }))) {
+    $("schedMode").value = S.settings.schedule.mode;
+    return;
+  }
+  saveSchedule();
+};
+const saveButtons = async () => {
+  const b = {};
+  document.querySelectorAll(".bt").forEach((el) => { b[el.dataset.key] = el.value; });
+  try {
+    const kept = (await api("/api/settings", { buttons: b })).settings.buttons;
+    if (Object.keys(b).some((k) => kept[k] !== (k === "like_prefix" ? b[k] : b[k].trim()))) {
+      toast(t("bt.rejected"));   // for kort eller en betalt knap: serveren beholdt det gamle navn
+      document.querySelectorAll(".bt").forEach((el) => { el.value = kept[el.dataset.key]; });
+    } else toast(t("saved"));
+  } catch {}
+};
+document.querySelectorAll(".bt").forEach((el) => { el.onfocus = () => { lastField = el; }; el.onchange = saveButtons; });
+$("btReset").onclick = async () => {
+  await save({ buttons: { like_prefix: "Synes godt om ", send_like: "Send synes godt om", consent: "Jeg er enig", close: "Afslut" } });
+  fillSettings();
+};
+$("inspect").onclick = async () => { try { await api("/api/inspect", {}); } catch {} };
+$("names").onclick = (e) => {
+  const chip = e.target.closest(".chip"); if (!chip || !lastField) return;
+  lastField.value = chip.textContent; saveButtons();
+};
+
+/* ---------- Polling ---------- */
+async function pollStatus() {
+  try {
+    const r = await fetch("/api/status");
+    S = await r.json();
+    $("offline").hidden = true;
+    if (!filled) {
+      filled = true; lang = S.settings.lang; applyI18n(); fillSettings();
+      if (!S.settings.accepted_terms) openTerms();
     }
-  }
-
-  // Tempo og forventet sluttid ud fra likes i den seneste kørsel (tidsstempler i loggen, fx "11:42:18  ♥ ...").
-  function pace(s, limit) {
-    const runStart = s.log.map(l => l.startsWith("── start")).lastIndexOf(true);
-    const times = s.log.slice(runStart + 1).filter(l => l.includes("♥")).map(l => {
-      const [h, m, sec] = l.slice(0, 8).split(":").map(Number);
-      return h * 3600 + m * 60 + sec;
-    });
-    if (times.length < 3) return "";
-    const perLike = (times.at(-1) - times[0]) / (times.length - 1);
-    let text = `${times.length} likes i denne kørsel · ${perLike.toFixed(1)} sek. pr. like`;
-    const left = limit - s.likes_today;
-    if (s.running && left > 0) {
-      const eta = new Date(Date.now() + left * perLike * 1000);
-      text += ` · ${left} tilbage, færdig ca. kl. ${eta.toTimeString().slice(0, 5)}`;
-    }
-    return text;
-  }
-
-  async function api(path, body) {
-    const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
-    const s = await r.json();
-    if (s.log) { window.lastStatus = s; if (!Object.keys(modes).length) { modes = s.modes; pick(mode); } render(s); }
-    return s;
-  }
-
-  document.querySelectorAll(".mode").forEach(b => b.onclick = () => pick(b.dataset.mode));
-  $("start").onclick = () => {
-    if (mode === "fast" && !confirm("Fast giver markant højere risiko for, at Hinge begrænser eller lukker kontoen. Fortsæt?")) return;
-    api("/api/start", { mode, max: $("max").value, daily: $("daily").value, minutes: $("minutes").value });
-  };
-  $("stop").onclick = () => api("/api/stop", {});
-  $("check").onclick = () => api("/api/check", {});
-  $("daily").oninput = () => render(window.lastStatus);
-
-  api("/api/status").catch(() => {});
-  setInterval(() => api("/api/status").catch(() => { $("stateText").textContent = "Appen er lukket"; }), 1500);
+    render();
+  } catch { if (filled) $("offline").hidden = false; }
+  setTimeout(pollStatus, 1500);
+}
+async function pollDevice() {
+  try { D = await (await fetch("/api/device")).json(); render(); } catch {}
+  setTimeout(pollDevice, 4000);
+}
+try { const v = localStorage.getItem("view"); if (v && $("view-" + v)) view = v; } catch {}
+applyI18n();
+show(view);
+pollStatus();
+pollDevice();
 </script>
 </body>
 </html>
