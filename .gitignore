@@ -19,4 +19,5 @@ session.json
 iphone/.venv/
 iphone/state.tmp
 iphone/settings.json
+iphone/check.json
 iphone/*.tmp

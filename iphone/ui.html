@@ -379,7 +379,7 @@ const I18N = {
     "dev.nodriver": "USB-driver mangler", "dev.nodriver_sub": "Installer iTunes – se Opsætning", "dev.unpaired": "iPhone fundet", "dev.unpaired_sub": "Lås op og tryk 'Stol på'", "dev.ios": "iOS {v}",
     "state.idle": "Klar", "state.swipe": "Kører", "state.check": "Tjekker forbindelsen", "state.ipa": "Henter testappen", "state.inspect": "Aflæser skærmen", "state.stopping": "Stopper …",
     "swipe.sub": "Liker profiler i Hinge på din iPhone over USB. Hold telefonen låst op med Hinge åben.",
-    "swipe.today": "I dag", "swipe.of": "af {n}", "swipe.mode": "Tempo",
+    "swipe.today": "I dag", "swipe.of": "af {n}", "swipe.limit": "grænse {n}", "swipe.mode": "Tempo",
     "mode.secure": "Langsomt og grundigt, lange pauser.", "mode.human": "Menneskeligt tempo. Standard.", "mode.fast": "Ca. 8 sek. pr. like, korte pauser.",
     "risk.low": "Lav risiko", "risk.mid": "Normal risiko", "risk.high": "Høj ban-risiko", "mode.lim": "{daily} likes/dag · {minutes} min",
     "swipe.max": "Max likes i denne kørsel", "swipe.max_ph": "ingen grænse",
@@ -389,6 +389,7 @@ const I18N = {
     "swipe.log_empty": "Ingen kørsler endnu. Tryk Start, eller tjek forbindelsen først.",
     "pace.line": "{n} likes i denne kørsel · {s} sek. pr. like", "pace.eta": "{left} tilbage, færdig ca. kl. {t}",
     "swipe.reached": "Dagens grænse for {mode} er nået. Tælleren starter forfra i morgen.",
+    "swipe.reached_hint": "Grænsen på {daily} likes i dag er nået for {mode}. Vil du swipe mere i dag, så vælg et tempo med højere grænse eller hæv den under Indstillinger → Grænser pr. tempo (højere ban-risiko).",
     "swipe.max_bad": "Max skal være et helt tal fra 1 til 1000 – eller tomt for ingen grænse.",
     "sched.fast": "Den planlagte kørsel starter af sig selv i Fast-tempo hver dag.", "sched.fast_ok": "Brug Fast",
     "bt.rejected": "Ikke gemt: navnet er for kort eller ligner en betalt knap (rose, boost).",
@@ -403,7 +404,7 @@ const I18N = {
     "s5.title": "Stol på udvikleren", "s5.text": "På iPhonen: Indstillinger → Generelt → VPN og enhedsstyring → tryk dit Apple-ID → Stol på. Med et gratis Apple-ID skal testappen installeres igen hver 7. dag.",
     "s6.title": "Gør Hinge klar", "s6.text": "Log ind i Hinge og åbn Discover. Sæt Indstillinger → Skærm og lysstyrke → Autolås → Aldrig, ellers stopper kørslen, når skærmen slukker.",
     "s7.title": "Test forbindelsen", "s7.text": "Starter testappen og kigger på Hinge-skærmen uden at like nogen.",
-    "s7.ok": "Virker – {n} like-knapper på skærmen.", "s7.ok0": "Virker – men ingen like-knap på skærmen lige nu. Åbn Discover i Hinge.", "s7.fail": "Virkede ikke – se beskeden i loggen under Swipe.",
+    "s7.ok": "Virker – {n} like-knapper på skærmen.", "s7.ok0": "Virker – men ingen like-knap på skærmen lige nu. Åbn Discover i Hinge.", "s7.fail": "Virkede ikke – se beskeden i loggen under Swipe.", "s7.fail_msg": "Virkede ikke: {msg}", "s7.at": "Sidst testet {when}.",
     "setup.ready": "Alt er klar. Gå til Swipe og tryk Start.", "devmode.ok": "Kig under Indstillinger → Anonymitet og sikkerhed på telefonen.",
     "history.sub": "Likes pr. dag, gemt lokalt på denne computer.", "kpi.today": "I dag", "kpi.week": "Sidste 7 dage", "kpi.month": "Sidste 30 dage", "kpi.best": "Bedste dag",
     "history.chart": "Likes de sidste 30 dage", "history.empty": "Ingen historik endnu – den bygger sig op, når du swiper.",
@@ -435,7 +436,7 @@ const I18N = {
     "dev.nodriver": "USB driver missing", "dev.nodriver_sub": "Install iTunes – see Setup", "dev.unpaired": "iPhone found", "dev.unpaired_sub": "Unlock and tap 'Trust'", "dev.ios": "iOS {v}",
     "state.idle": "Ready", "state.swipe": "Running", "state.check": "Checking connection", "state.ipa": "Downloading test app", "state.inspect": "Reading the screen", "state.stopping": "Stopping …",
     "swipe.sub": "Likes profiles in Hinge on your iPhone over USB. Keep the phone unlocked with Hinge open.",
-    "swipe.today": "Today", "swipe.of": "of {n}", "swipe.mode": "Pace",
+    "swipe.today": "Today", "swipe.of": "of {n}", "swipe.limit": "limit {n}", "swipe.mode": "Pace",
     "mode.secure": "Slow and thorough, long breaks.", "mode.human": "Human pace. The default.", "mode.fast": "About 8 s per like, short breaks.",
     "risk.low": "Low risk", "risk.mid": "Normal risk", "risk.high": "High ban risk", "mode.lim": "{daily} likes/day · {minutes} min",
     "swipe.max": "Max likes this run", "swipe.max_ph": "no limit",
@@ -445,6 +446,7 @@ const I18N = {
     "swipe.log_empty": "No runs yet. Press Start, or check the connection first.",
     "pace.line": "{n} likes this run · {s} s per like", "pace.eta": "{left} to go, done around {t}",
     "swipe.reached": "Today's limit for {mode} is reached. The counter starts over tomorrow.",
+    "swipe.reached_hint": "The limit of {daily} likes today is reached for {mode}. To swipe more today, pick a pace with a higher limit or raise it under Settings → Limits per pace (higher ban risk).",
     "swipe.max_bad": "Max must be a whole number from 1 to 1000 – or empty for no limit.",
     "sched.fast": "The scheduled run will start by itself at Fast pace every day.", "sched.fast_ok": "Use Fast",
     "bt.rejected": "Not saved: the name is too short or looks like a paid button (rose, boost).",
@@ -459,7 +461,7 @@ const I18N = {
     "s5.title": "Trust the developer", "s5.text": "On the iPhone: Settings → General → VPN & Device Management → tap your Apple ID → Trust. With a free Apple ID, reinstall the test app every 7 days.",
     "s6.title": "Get Hinge ready", "s6.text": "Sign in to Hinge and open Discover. Set Settings → Display & Brightness → Auto-Lock → Never, or the run stops when the screen turns off.",
     "s7.title": "Test the connection", "s7.text": "Starts the test app and looks at the Hinge screen without liking anyone.",
-    "s7.ok": "Works – {n} like buttons on screen.", "s7.ok0": "Works – but no like button on screen right now. Open Discover in Hinge.", "s7.fail": "Didn't work – see the message in the log under Swipe.",
+    "s7.ok": "Works – {n} like buttons on screen.", "s7.ok0": "Works – but no like button on screen right now. Open Discover in Hinge.", "s7.fail": "Didn't work – see the message in the log under Swipe.", "s7.fail_msg": "Didn't work: {msg}", "s7.at": "Last tested {when}.",
     "setup.ready": "All set. Go to Swipe and press Start.", "devmode.ok": "Look under Settings → Privacy & Security on the phone.",
     "history.sub": "Likes per day, stored locally on this computer.", "kpi.today": "Today", "kpi.week": "Last 7 days", "kpi.month": "Last 30 days", "kpi.best": "Best day",
     "history.chart": "Likes over the last 30 days", "history.empty": "No history yet – it builds up as you swipe.",
@@ -580,16 +582,17 @@ function renderSwipe() {
   document.querySelectorAll(".mode").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
   document.querySelectorAll("[data-lim]").forEach((el) => { const [d, m] = S.limits[el.dataset.lim]; el.textContent = t("mode.lim", { daily: d, minutes: m }); });
   $("today").textContent = S.likes_today;
-  $("todayOf").textContent = t("swipe.of", { n: daily });
+  $("todayOf").textContent = t(S.likes_today > daily ? "swipe.limit" : "swipe.of", { n: daily });
   const reached = S.likes_today >= daily;
   $("ringFill").style.strokeDashoffset = 326.7 * (1 - Math.min(1, S.likes_today / Math.max(1, daily)));
   $("ringFill").style.stroke = reached ? "var(--good)" : "";
   $("pace").textContent = pace(mode) || (reached && S.task !== "swipe" ? t("swipe.reached", { mode: MODE_NAMES[mode] }) : "");
   const max = runMax(), to = String(S.settings.to_hour).padStart(2, "0") + ":00";
-  $("summary").textContent = max === null ? t("swipe.max_bad") : max ? t("swipe.summary_max", { max, daily, minutes, to }) : t("swipe.summary", { daily, minutes, to });
-  $("summary").style.color = max === null ? "var(--bad)" : "";
-  const busy = S.task !== null;
-  $("start").disabled = busy || max === null;
+  const busy = S.task !== null, blocked = reached && !busy;   // en kørsel ville stoppe med det samme
+  $("summary").textContent = max === null ? t("swipe.max_bad") : blocked ? t("swipe.reached_hint", { daily, mode: MODE_NAMES[mode] })
+    : max ? t("swipe.summary_max", { max, daily, minutes, to }) : t("swipe.summary", { daily, minutes, to });
+  $("summary").style.color = max === null ? "var(--bad)" : blocked ? "var(--warn)" : "";
+  $("start").disabled = busy || max === null || reached;
   $("check").disabled = busy;
   $("stop").disabled = !(busy && S.task !== "ipa") || stopping;
   document.querySelectorAll(".mode").forEach((b) => { b.disabled = busy; });
@@ -661,8 +664,9 @@ function renderSetup() {
   const busy = S.task !== null;
   $("ipaBtn").disabled = $("check2").disabled = busy;
   $("devmodeBtn").disabled = !(D && D.paired);
-  const c = S.check;
-  $("checkResult").textContent = !c ? "" : c.ok ? (c.found ? t("s7.ok", { n: c.found }) : t("s7.ok0")) : t("s7.fail");
+  const c = S.check, when = c && c.at ? new Date(c.at).toLocaleString(lang === "da" ? "da-DK" : "en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+  const fail = c && c.reason ? t("s7.fail_msg", { msg: c.reason }) : t("s7.fail");
+  $("checkResult").textContent = !c ? "" : (c.ok ? (c.found ? t("s7.ok", { n: c.found }) : t("s7.ok0")) : fail) + (when ? " " + t("s7.at", { when }) : "");
   $("checkResult").style.color = !c ? "" : c.ok ? "var(--good)" : "var(--bad)";
 }
 function lastDays(n) {

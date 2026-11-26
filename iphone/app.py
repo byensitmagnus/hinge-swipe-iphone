@@ -22,13 +22,15 @@ from pathlib import Path
 
 import make_ipa
 import swipe
-from logic import APP_NAME, MODES, VERSION, data_dir, load_settings, load_state, run_limits, save_settings, schedule_due
+from logic import (APP_NAME, MODES, VERSION, _read_json, _write_json, data_dir, load_settings, load_state, run_limits,
+                   save_settings, schedule_due)
 from wda import device_status, reveal_developer_mode, screen_names
 
 RES = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))   # ui.html ligger her (også i den installerede app)
 DATA = data_dir()
 SETTINGS, STATE, STOP = DATA / "settings.json", DATA / "state.json", DATA / "STOP"
 IPA = DATA / "WebDriverAgentRunner.ipa"
+CHECK = DATA / "check.json"   # seneste forbindelsestest, så Opsætning husker den efter genstart
 PORT = int(os.environ.get("HINGE_APP_PORT", "8765"))
 
 APP_MSG = {
@@ -43,7 +45,14 @@ APP_MSG = {
 log: collections.deque[str] = collections.deque(maxlen=600)
 lock = threading.RLock()          # én opgave ad gangen + indstillinger skrives ikke samtidigt
 task: dict = {"name": None, "thread": None}
-last: dict = {"check": None, "names": [], "device": None, "device_at": 0.0, "run": None}
+
+
+def saved_check() -> dict | None:
+    c = _read_json(CHECK)
+    return c if isinstance(c.get("ok"), bool) else None
+
+
+last: dict = {"check": saved_check(), "names": [], "device": None, "device_at": 0.0, "run": None}
 dev_lock = threading.Lock()
 quitting = threading.Event()
 ui: dict = {"window": None, "server": None}
@@ -95,10 +104,19 @@ def do_check(cfg: dict) -> None:
     last["check"] = None
     try:
         res = asyncio.run(swipe.run(cfg))
-        last["check"] = {"ok": res["ok"], "found": res["found"], "at": dt.datetime.now().isoformat(timespec="seconds")}
-    except Exception:
-        last["check"] = {"ok": False, "found": None, "at": dt.datetime.now().isoformat(timespec="seconds")}
+    except Exception as e:
+        remember_check(False, None, swipe.friendly_error(e) or "")
         raise
+    line = log[-1] if log else ""   # ved fejl: kørslens sidste linje, fx "16:24:29  Telefonen er låst …"
+    remember_check(res["ok"], res["found"], line[8:].strip() if not res["ok"] and line[:2].isdigit() else "")
+
+
+def remember_check(ok: bool, found, reason: str = "") -> None:
+    last["check"] = {"ok": ok, "found": found, "reason": reason, "at": dt.datetime.now().isoformat(timespec="seconds")}
+    try:
+        _write_json(CHECK, last["check"])
+    except OSError:   # kun hukommelsen går tabt; selve tjekket er gyldigt
+        traceback.print_exc()
 
 
 def do_ipa() -> None:

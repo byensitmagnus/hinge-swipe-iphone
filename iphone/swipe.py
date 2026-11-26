@@ -25,7 +25,7 @@ LANG = "da"
 
 MSG = {
     "da": {
-        "ready": "Klar ({mode}). Likes i dag: {today}/{daily}",
+        "ready": "Klar ({mode}). {today} likes i dag, grænse {daily}.",
         "stopped": "Stoppet.",
         "daily_cap": "Dagens grænse på {daily} likes er nået.",
         "run_cap": "Nået {max} likes i denne kørsel.",
@@ -52,7 +52,7 @@ MSG = {
         "wda_timeout": "Testappen svarede ikke – lås telefonen op, og prøv igen.",
     },
     "en": {
-        "ready": "Ready ({mode}). Likes today: {today}/{daily}",
+        "ready": "Ready ({mode}). {today} likes today, limit {daily}.",
         "stopped": "Stopped.",
         "daily_cap": "Reached today's limit of {daily} likes.",
         "run_cap": "Reached {max} likes in this run.",
@@ -227,7 +227,7 @@ async def run(cfg: dict) -> dict:
 
     try:
         async with phone(should_stop=STOP.exists) as c:
-            log(say("ready", mode=cfg["mode"], today=state["likes_today"], daily=daily))
+            log(say("ready", mode=cfg["mode"].capitalize(), today=state["likes_today"], daily=daily))
             result["ok"] = True
             while True:
                 if STOP.exists():

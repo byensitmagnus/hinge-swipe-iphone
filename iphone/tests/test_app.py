@@ -83,6 +83,13 @@ class Server(unittest.TestCase):
         self.assertEqual(r.getheader("X-Frame-Options"), "DENY")
         self.assertIn("frame-ancestors 'none'", r.getheader("Content-Security-Policy"))
 
+    def test_check_is_remembered(self):   # Opsætning skal huske tjekket – og hvorfor det fejlede – når appen startes igen
+        app.remember_check(False, None, "Telefonen er låst")
+        self.assertEqual(app.saved_check()["reason"], "Telefonen er låst")
+        app.remember_check(True, 2)
+        self.assertEqual(app.saved_check()["found"], 2)
+        self.assertTrue(json.loads(self.req("GET", "/api/status")[1])["check"]["ok"])
+
     def test_port_is_exclusive(self):   # en app mere må ikke kunne dele porten (Windows: SO_REUSEADDR)
         with self.assertRaises(OSError):
             app.Server(("127.0.0.1", app.PORT), app.Handler)

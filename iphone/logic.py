@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 APP_NAME = "Hinge Auto Swipe"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 MODES = {
     # secure: lavest ban-risiko. human: standard, menneskeligt tempo. fast: hurtigt, markant højere ban-risiko.
