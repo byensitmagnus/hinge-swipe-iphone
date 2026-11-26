@@ -5,7 +5,24 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from logic import human_delay, in_active_hours, load_state, save_state  # noqa: E402
+from logic import MODES, human_delay, in_active_hours, load_state, save_state  # noqa: E402
+
+
+class Modes(unittest.TestCase):
+    def test_three_modes_ordered_by_speed(self):
+        self.assertEqual(set(MODES), {"secure", "human", "fast"})
+        self.assertLess(MODES["secure"]["daily"], MODES["human"]["daily"])
+        self.assertLess(MODES["human"]["daily"], MODES["fast"]["daily"])
+        self.assertGreater(MODES["secure"]["delay"][0], MODES["fast"]["delay"][0])
+
+    def test_human_keeps_project_defaults(self):   # AGENTS.md: 80/dag, 30 min
+        self.assertEqual((MODES["human"]["daily"], MODES["human"]["minutes"]), (80, 30))
+
+    def test_ranges_are_valid(self):
+        for m in MODES.values():
+            for lo, hi in (m["delay"], m["pause"], m["every"]):
+                self.assertLessEqual(lo, hi)
+            self.assertTrue(0 <= m["read"] <= 1)
 
 
 class HumanDelay(unittest.TestCase):

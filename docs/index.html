@@ -125,9 +125,12 @@ pip install -r requirements.txt</code></pre>
     <h3 lang-only="en">6. Swipe</h3><h3 lang-only="da">6. Swipe</h3>
     <p lang-only="en">Keep the iPhone plugged in and unlocked. Open Hinge on the Discover tab, then try it safely first:</p>
     <p lang-only="da">Lad iPhonen sidde i USB og være låst op. Åbn Hinge på Discover-fanen, og prøv det først forsigtigt:</p>
+    <p lang-only="en"><b>Easiest:</b> double-click <code>start.bat</code> (Windows) or <code>start.command</code> (Mac) in the project folder. The app opens in your browser: pick a mode, press <b>Start</b>, follow today's count and the live log, press <b>Stop</b>. Or use the command line:</p>
+    <p lang-only="da"><b>Nemmest:</b> dobbeltklik <code>start.bat</code> (Windows) eller <code>start.command</code> (Mac) i projektmappen. Appen åbner i din browser: vælg tempo, tryk <b>Start</b>, følg dagens tæller og loggen live, tryk <b>Stop</b>. Eller brug kommandolinjen:</p>
     <pre><code>python swipe.py --dry        # shows what it would do, likes nothing
 python swipe.py --max 5      # five likes, then stops
-python swipe.py              # a normal session</code></pre>
+python swipe.py              # a normal session (human mode)
+python swipe.py --mode fast  # or --mode secure</code></pre>
     <p lang-only="en">Stop it any time by creating an empty file called <code>STOP</code> in the <code>iphone</code> folder, or press Ctrl+C.</p>
     <p lang-only="da">Stop den når som helst ved at oprette en tom fil kaldet <code>STOP</code> i mappen <code>iphone</code>, eller tryk Ctrl+C.</p>
   </div></label>
@@ -135,14 +138,15 @@ python swipe.py              # a normal session</code></pre>
   <h2 lang-only="en">Settings</h2><h2 lang-only="da">Indstillinger</h2>
   <table>
     <tr><th>Option</th><th lang-only="en">Default</th><th lang-only="da">Standard</th><th lang-only="en">Meaning</th><th lang-only="da">Betydning</th></tr>
-    <tr><td><code>--daily</code></td><td>80</td><td></td><td lang-only="en">Max likes per day</td><td lang-only="da">Max likes pr. dag</td></tr>
-    <tr><td><code>--minutes</code></td><td>30</td><td></td><td lang-only="en">Stop after this many minutes</td><td lang-only="da">Stop efter så mange minutter</td></tr>
+    <tr><td><code>--mode</code></td><td>human</td><td></td><td lang-only="en"><code>secure</code> (50/day, slow), <code>human</code> (80/day), <code>fast</code> (200/day, ~8 s per like, clearly higher ban risk)</td><td lang-only="da"><code>secure</code> (50/dag, langsomt), <code>human</code> (80/dag), <code>fast</code> (200/dag, ca. 8 sek. pr. like, tydeligt højere ban-risiko)</td></tr>
+    <tr><td><code>--daily</code></td><td lang-only="en">from mode</td><td lang-only="da">fra tempo</td><td lang-only="en">Max likes per day</td><td lang-only="da">Max likes pr. dag</td></tr>
+    <tr><td><code>--minutes</code></td><td lang-only="en">from mode</td><td lang-only="da">fra tempo</td><td lang-only="en">Stop after this many minutes</td><td lang-only="da">Stop efter så mange minutter</td></tr>
     <tr><td><code>--from-hour</code> / <code>--to-hour</code></td><td>8 / 23</td><td></td><td lang-only="en">Only swipe between these hours (local time)</td><td lang-only="da">Swipe kun mellem disse klokkeslæt (lokal tid)</td></tr>
     <tr><td><code>--max</code></td><td>0</td><td></td><td lang-only="en">Likes in this run (0 = no limit)</td><td lang-only="da">Likes i denne kørsel (0 = ingen grænse)</td></tr>
     <tr><td><code>--dry</code></td><td>–</td><td></td><td lang-only="en">Look, don't like</td><td lang-only="da">Kig, men like ikke</td></tr>
   </table>
-  <p lang-only="en">Pace: 5–12 seconds between likes, now and then a longer look, a 45–120 second break every 12–25 profiles. It never taps the paid <i>Send a Rose</i> button and never sends messages.</p>
-  <p lang-only="da">Tempo: 5–12 sekunder mellem likes, af og til et længere kig og en pause på 45–120 sekunder hver 12.–25. profil. Den trykker aldrig på den betalte <i>Send en rose</i>-knap og sender aldrig beskeder.</p>
+  <p lang-only="en">Human pace: 5–12 seconds between likes, now and then a longer look, a 45–120 second break every 12–25 profiles. It never taps the paid <i>Send a Rose</i> button and never sends messages.</p>
+  <p lang-only="da">Human-tempo: 5–12 sekunder mellem likes, af og til et længere kig og en pause på 45–120 sekunder hver 12.–25. profil. Den trykker aldrig på den betalte <i>Send en rose</i>-knap og sender aldrig beskeder.</p>
 
   <h2 lang-only="en">Troubleshooting</h2><h2 lang-only="da">Fejlfinding</h2>
   <details><summary lang-only="en">"device was not, or could not be, unlocked"</summary><summary lang-only="da">"device was not, or could not be, unlocked"</summary>

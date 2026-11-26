@@ -53,6 +53,7 @@
   .big { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
   .bar { flex: 1; height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
   .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s; }
+  .meta { margin: 10px 0 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
   pre { margin: 0; background: var(--logbg); color: var(--logink); border-radius: 10px; padding: 14px;
         height: 280px; overflow: auto; font: 12.5px/1.55 ui-monospace, "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; }
   .note { font-size: 13px; color: var(--muted); margin-top: 20px; }
@@ -70,6 +71,7 @@
   <section class="card">
     <h2>I dag</h2>
     <div class="stats"><span class="big" id="today">0</span><div class="bar"><i id="bar"></i></div><span id="limit">/ 80</span></div>
+    <p class="meta" id="pace">&nbsp;</p>
   </section>
 
   <section class="card">
@@ -121,12 +123,31 @@
     $("stateText").textContent = s.running ? "Kører" : "Klar";
     $("start").disabled = $("check").disabled = s.running;
     $("stop").disabled = !s.running;
+    $("pace").innerHTML = pace(s, limit) || "&nbsp;";
     const text = s.log.join("\n") || "Ingen kørsler endnu.";
     if (text !== lastLog) {
       const el = $("log"), atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
       el.textContent = lastLog = text;
       if (atEnd) el.scrollTop = el.scrollHeight;
     }
+  }
+
+  // Tempo og forventet sluttid ud fra likes i den seneste kørsel (tidsstempler i loggen, fx "11:42:18  ♥ ...").
+  function pace(s, limit) {
+    const runStart = s.log.map(l => l.startsWith("── start")).lastIndexOf(true);
+    const times = s.log.slice(runStart + 1).filter(l => l.includes("♥")).map(l => {
+      const [h, m, sec] = l.slice(0, 8).split(":").map(Number);
+      return h * 3600 + m * 60 + sec;
+    });
+    if (times.length < 3) return "";
+    const perLike = (times.at(-1) - times[0]) / (times.length - 1);
+    let text = `${times.length} likes i denne kørsel · ${perLike.toFixed(1)} sek. pr. like`;
+    const left = limit - s.likes_today;
+    if (s.running && left > 0) {
+      const eta = new Date(Date.now() + left * perLike * 1000);
+      text += ` · ${left} tilbage, færdig ca. kl. ${eta.toTimeString().slice(0, 5)}`;
+    }
+    return text;
   }
 
   async function api(path, body) {

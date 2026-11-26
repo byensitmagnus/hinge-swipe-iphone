@@ -129,7 +129,7 @@ async def main() -> None:
 
     state = load_state(STATE)
     started = time.monotonic()
-    done = anomalies = since_break = 0
+    done = anomalies = since_break = errors = 0
     next_break = random.randint(*m["every"])
 
     async with phone() as c:
@@ -146,50 +146,61 @@ async def main() -> None:
             if not in_active_hours(dt.datetime.now().hour, a.from_hour, a.to_hour):
                 return log("Tidsrummet er slut – stopper.")
 
-            button = await quick_like(c) if quick and not a.dry else None
-            if button is None:
-                names = [e["name"] or "" for e in await visible(c)]   # grundig vej: skærmen læses én gang (~1,7 s)
-                if "SBCoverSheetWindow" in names:
-                    return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
-                if "Jeg er enig" in names and await accept_consent(c):
-                    log("Privatlivs-vindue accepteret.")
-                    await asyncio.sleep(2)
+            try:
+                button = await quick_like(c) if quick and not a.dry else None
+                if button is None:
+                    names = [e["name"] or "" for e in await visible(c)]   # grundig vej: skærmen læses én gang (~1,7 s)
+                    if "SBCoverSheetWindow" in names:
+                        return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
+                    if "Jeg er enig" in names and await accept_consent(c):
+                        log("Privatlivs-vindue accepteret.")
+                        await asyncio.sleep(2)
+                        continue
+                    if await ensure_discover(c, set(names)):
+                        log("Var ikke på Discover – gik tilbage.")
+                        continue
+
+                    if a.dry:
+                        return log(f"(prøve) like-knapper på skærmen: {[n for n in names if n.startswith(LIKE_PREFIX)]}")
+
+                    if random.random() < m["read"]:   # scroll lidt på profilen, som en der læser den
+                        await read_profile(c)
+                    button = await like_current(c, names, quick)
+                if button is None:
+                    anomalies += 1
+                    now = await visible(c)
+                    if any(e["name"] == "SBCoverSheetWindow" for e in now):
+                        return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
+                    shown = " | ".join((e["name"] or "")[:30] for e in now[:12])
+                    log(f"Uventet skærm ({anomalies}/3): {shown}")
+                    if anomalies >= 3:
+                        return log("For mange uventede skærme – stopper (tjek telefonen).")
+                    await asyncio.sleep(3)
                     continue
-                if await ensure_discover(c, set(names)):
-                    log("Var ikke på Discover – gik tilbage.")
-                    continue
 
-                if a.dry:
-                    return log(f"(prøve) like-knapper på skærmen: {[n for n in names if n.startswith(LIKE_PREFIX)]}")
+                anomalies = 0
+                done += 1
+                state["likes_today"] += 1
+                save_state(STATE, state)
+                log(f"♥ {button}  (i dag {state['likes_today']})")
 
-                if random.random() < m["read"]:   # scroll lidt på profilen, som en der læser den
-                    await read_profile(c)
-                button = await like_current(c, names, quick)
-            if button is None:
-                anomalies += 1
-                now = await visible(c)
-                if any(e["name"] == "SBCoverSheetWindow" for e in now):
-                    return log("Telefonen er låst – lås op og sæt Indstillinger > Skærm > Autolås til 'Aldrig'. Stopper.")
-                shown = " | ".join((e["name"] or "")[:30] for e in now[:12])
-                log(f"Uventet skærm ({anomalies}/3): {shown}")
-                if anomalies >= 3:
-                    return log("For mange uventede skærme – stopper (tjek telefonen).")
-                await asyncio.sleep(3)
-                continue
-
-            anomalies = 0
-            done += 1
-            state["likes_today"] += 1
-            save_state(STATE, state)
-            log(f"♥ {button}  (i dag {state['likes_today']})")
-
-            since_break += 1
-            if since_break >= next_break:
-                since_break, next_break = 0, random.randint(*m["every"])
-                pause = random.uniform(*m["pause"])
-                log(f"Pause på {pause:.0f} s")
-                await nap(c, pause)
-            await nap(c, human_delay(random.random(), random.random(), *m["delay"]))
+                since_break += 1
+                if since_break >= next_break:
+                    since_break, next_break = 0, random.randint(*m["every"])
+                    pause = random.uniform(*m["pause"])
+                    log(f"Pause på {pause:.0f} s")
+                    await nap(c, pause)
+                await nap(c, human_delay(random.random(), random.random(), *m["delay"]))
+                errors = 0
+            except Exception as e:   # WDA-hik eller Hinge lukket/crashet: genåbn Hinge og prøv igen
+                if "unlocked" in str(e) or "Locked" in str(e):
+                    raise
+                errors += 1
+                log(f"Fejl ({errors}/3): {str(e)[:120]} – genåbner Hinge.")
+                if errors >= 3:
+                    raise
+                await activate(c)
+                await asyncio.sleep(4)
 
 
 if __name__ == "__main__":
@@ -201,5 +212,7 @@ if __name__ == "__main__":
     except Exception as e:
         if "unlocked" in str(e) or "Locked" in str(e):
             log("Telefonen er låst – lås op (og sæt Autolås til 'Aldrig'), kør så igen.")
+        elif type(e).__name__ == "NoDeviceConnectedError":
+            log("Ingen iPhone fundet – sæt USB-kablet i, lås telefonen op og tryk 'Stol på' hvis den spørger. Kør så igen.")
         else:
             raise
